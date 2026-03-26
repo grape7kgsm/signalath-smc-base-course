@@ -15,7 +15,9 @@ export async function generateStaticParams() {
   return getAllContents().map((c) => ({ slug: c.slug }));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const content = getContentBySlug(slug);
   if (!content) return {};
@@ -25,52 +27,244 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-function renderBody(text: string) {
-  const paragraphs = text.split("\n\n");
-  return paragraphs.map((p, i) => {
-    const boldMatch = p.match(/^\*\*(.+?)\*\*$/);
+function renderInline(text: string) {
+  // Handle inline **bold** and 「keyword」
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    const boldMatch = part.match(/^\*\*(.+)\*\*$/);
     if (boldMatch) {
       return (
-        <h2
-          key={i}
-          className="text-lg sm:text-xl font-bold mt-12 mb-5 text-white border-l-2 border-cyan-500 pl-3"
-        >
+        <strong key={i} className="text-white font-semibold">
           {boldMatch[1]}
+        </strong>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
+function renderBlock(block: string, blockIndex: number) {
+  const paragraphs = block.split("\n\n");
+  return paragraphs.map((p, i) => {
+    const key = `${blockIndex}-${i}`;
+    const trimmed = p.trim();
+
+    // h2: standalone **bold line**
+    const h2Match = trimmed.match(/^\*\*(.+?)\*\*$/);
+    if (h2Match) {
+      return (
+        <h2
+          key={key}
+          className="text-lg sm:text-xl font-bold mt-14 mb-5 text-white border-l-2 border-cyan-500 pl-3"
+        >
+          {h2Match[1]}
         </h2>
       );
     }
 
-    const headingContent = p.match(/^\*\*(.+?)\*\*\n([\s\S]+)$/);
-    if (headingContent) {
+    // h2 + following text
+    const h2Content = trimmed.match(/^\*\*(.+?)\*\*\n([\s\S]+)$/);
+    if (h2Content) {
+      const rest = h2Content[2];
       return (
-        <div key={i}>
-          <h2 className="text-lg sm:text-xl font-bold mt-12 mb-5 text-white border-l-2 border-cyan-500 pl-3">
-            {headingContent[1]}
+        <div key={key}>
+          <h2 className="text-lg sm:text-xl font-bold mt-14 mb-5 text-white border-l-2 border-cyan-500 pl-3">
+            {h2Content[1]}
           </h2>
-          <p className="text-[15px] leading-loose text-gray-200 mb-5">
-            {headingContent[2]}
-          </p>
+          {renderSubContent(rest, key)}
         </div>
       );
     }
 
-    if (p.startsWith("【図解】")) {
+    // h3: ### heading
+    if (trimmed.startsWith("### ")) {
+      return (
+        <h3
+          key={key}
+          className="text-base sm:text-lg font-semibold mt-10 mb-4 text-cyan-300"
+        >
+          {trimmed.slice(4)}
+        </h3>
+      );
+    }
+
+    // Summary box: starts with 📋
+    if (trimmed.startsWith("📋")) {
+      return renderSummaryBox(trimmed, key);
+    }
+
+    // Warning callout: starts with ⚠️
+    if (trimmed.startsWith("⚠️")) {
       return (
         <div
-          key={i}
-          className="bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-4 my-6 text-sm text-gray-400 italic"
+          key={key}
+          className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 my-6 text-sm"
         >
-          {p}
+          <p className="text-amber-300">{renderInline(trimmed)}</p>
         </div>
       );
     }
 
+    // Check callout: starts with ✅
+    if (trimmed.startsWith("✅")) {
+      return (
+        <div
+          key={key}
+          className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 my-6 text-sm"
+        >
+          <p className="text-emerald-300">{renderInline(trimmed)}</p>
+        </div>
+      );
+    }
+
+    // Comparison block: starts with ⚖️
+    if (trimmed.startsWith("⚖️")) {
+      return renderCompareBox(trimmed, key);
+    }
+
+    // Diagram placeholder
+    if (trimmed.startsWith("【図解】")) {
+      return (
+        <div
+          key={key}
+          className="bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-4 my-6 text-sm text-gray-400 italic"
+        >
+          {trimmed}
+        </div>
+      );
+    }
+
+    // Bullet list: all lines start with -
+    const lines = trimmed.split("\n");
+    if (lines.every((l) => l.startsWith("- "))) {
+      return (
+        <ul key={key} className="my-5 space-y-2.5 pl-1">
+          {lines.map((l, li) => (
+            <li
+              key={li}
+              className="flex items-start gap-2.5 text-[15px] leading-relaxed text-gray-200"
+            >
+              <span className="text-cyan-500 mt-1.5 flex-shrink-0 text-[8px]">
+                ●
+              </span>
+              <span>{renderInline(l.slice(2))}</span>
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    // Regular paragraph
     return (
-      <p key={i} className="text-[15px] leading-loose text-gray-200 mb-5">
-        {p}
+      <p
+        key={key}
+        className="text-[15px] leading-[1.9] text-gray-200 mb-5"
+      >
+        {renderInline(trimmed)}
       </p>
     );
   });
+}
+
+function renderSubContent(text: string, parentKey: string) {
+  const lines = text.split("\n");
+  const elements: React.ReactNode[] = [];
+  let currentBullets: string[] = [];
+
+  const flushBullets = () => {
+    if (currentBullets.length > 0) {
+      elements.push(
+        <ul
+          key={`${parentKey}-ul-${elements.length}`}
+          className="my-5 space-y-2.5 pl-1"
+        >
+          {currentBullets.map((b, bi) => (
+            <li
+              key={bi}
+              className="flex items-start gap-2.5 text-[15px] leading-relaxed text-gray-200"
+            >
+              <span className="text-cyan-500 mt-1.5 flex-shrink-0 text-[8px]">
+                ●
+              </span>
+              <span>{renderInline(b)}</span>
+            </li>
+          ))}
+        </ul>
+      );
+      currentBullets = [];
+    }
+  };
+
+  lines.forEach((line) => {
+    if (line.startsWith("- ")) {
+      currentBullets.push(line.slice(2));
+    } else {
+      flushBullets();
+      if (line.trim()) {
+        elements.push(
+          <p
+            key={`${parentKey}-p-${elements.length}`}
+            className="text-[15px] leading-[1.9] text-gray-200 mb-5"
+          >
+            {renderInline(line)}
+          </p>
+        );
+      }
+    }
+  });
+  flushBullets();
+
+  return <>{elements}</>;
+}
+
+function renderSummaryBox(text: string, key: string) {
+  const lines = text.split("\n");
+  const title = lines[0].replace("📋", "").trim();
+  const items = lines.slice(1).filter((l) => l.startsWith("- "));
+
+  return (
+    <div
+      key={key}
+      className="bg-cyan-500/[0.07] border border-cyan-500/20 rounded-xl p-5 my-8"
+    >
+      <p className="text-sm font-semibold text-cyan-400 mb-3">{title}</p>
+      <ul className="space-y-2">
+        {items.map((item, ii) => (
+          <li
+            key={ii}
+            className="flex items-start gap-2 text-sm text-gray-200"
+          >
+            <span className="text-cyan-500 mt-0.5 flex-shrink-0">▸</span>
+            <span>{renderInline(item.slice(2))}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function renderCompareBox(text: string, key: string) {
+  const lines = text.split("\n");
+  const title = lines[0].replace("⚖️", "").trim();
+  const items = lines.slice(1).filter((l) => l.trim());
+
+  return (
+    <div
+      key={key}
+      className="bg-white/[0.03] border border-white/10 rounded-xl p-5 my-8"
+    >
+      {title && (
+        <p className="text-sm font-semibold text-gray-300 mb-3">{title}</p>
+      )}
+      <div className="space-y-2">
+        {items.map((item, ii) => (
+          <p key={ii} className="text-sm text-gray-300">
+            {renderInline(item)}
+          </p>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default async function ContentPage({ params }: PageProps) {
@@ -82,7 +276,6 @@ export default async function ContentPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] relative">
-      {/* Grid background */}
       <div
         className="fixed inset-0 opacity-[0.05] pointer-events-none"
         style={{
@@ -129,10 +322,9 @@ export default async function ContentPage({ params }: PageProps) {
             </p>
           </div>
 
-          {/* Article body with reading panel */}
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 sm:p-8">
             {content.body.map((block, i) => (
-              <div key={i}>{renderBody(block)}</div>
+              <div key={i}>{renderBlock(block, i)}</div>
             ))}
           </div>
         </article>
