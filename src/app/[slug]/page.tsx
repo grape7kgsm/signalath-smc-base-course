@@ -26,10 +26,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 function renderBody(text: string) {
-  // Split by double newline for paragraphs, handle **bold**
   const paragraphs = text.split("\n\n");
   return paragraphs.map((p, i) => {
-    // Check if paragraph is a heading (starts with **)
     const boldMatch = p.match(/^\*\*(.+?)\*\*$/);
     if (boldMatch) {
       return (
@@ -42,7 +40,6 @@ function renderBody(text: string) {
       );
     }
 
-    // Check if starts with bold heading then content
     const headingContent = p.match(/^\*\*(.+?)\*\*\n([\s\S]+)$/);
     if (headingContent) {
       return (
@@ -57,7 +54,6 @@ function renderBody(text: string) {
       );
     }
 
-    // Check for diagram placeholder
     if (p.startsWith("【図解】")) {
       return (
         <div
@@ -88,7 +84,7 @@ export default async function ContentPage({ params }: PageProps) {
     <main className="max-w-3xl mx-auto px-4 py-12 sm:py-16">
       <div className="mb-8">
         <Link
-          href="/contents"
+          href="/"
           className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
         >
           &larr; 講座一覧に戻る
@@ -133,7 +129,7 @@ export default async function ContentPage({ params }: PageProps) {
         <div className="flex flex-col sm:flex-row justify-between gap-4">
           {prev ? (
             <Link
-              href={`/contents/${prev.slug}`}
+              href={`/${prev.slug}`}
               className="flex-1 border border-gray-200 rounded-lg p-4 hover:border-gray-400 hover:bg-gray-50 transition-colors"
             >
               <span className="text-xs text-gray-500 block mb-1">
@@ -148,7 +144,7 @@ export default async function ContentPage({ params }: PageProps) {
           )}
           {next ? (
             <Link
-              href={`/contents/${next.slug}`}
+              href={`/${next.slug}`}
               className="flex-1 border border-gray-200 rounded-lg p-4 hover:border-gray-400 hover:bg-gray-50 transition-colors text-right"
             >
               <span className="text-xs text-gray-500 block mb-1">
