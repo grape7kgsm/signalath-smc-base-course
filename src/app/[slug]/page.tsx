@@ -33,7 +33,7 @@ function renderBody(text: string) {
       return (
         <h2
           key={i}
-          className="text-lg sm:text-xl font-bold mt-10 mb-4 text-white"
+          className="text-lg sm:text-xl font-bold mt-12 mb-5 text-white border-l-2 border-cyan-500 pl-3"
         >
           {boldMatch[1]}
         </h2>
@@ -44,10 +44,10 @@ function renderBody(text: string) {
     if (headingContent) {
       return (
         <div key={i}>
-          <h2 className="text-lg sm:text-xl font-bold mt-10 mb-4 text-white">
+          <h2 className="text-lg sm:text-xl font-bold mt-12 mb-5 text-white border-l-2 border-cyan-500 pl-3">
             {headingContent[1]}
           </h2>
-          <p className="text-base leading-relaxed text-gray-400 mb-4">
+          <p className="text-[15px] leading-loose text-gray-200 mb-5">
             {headingContent[2]}
           </p>
         </div>
@@ -58,7 +58,7 @@ function renderBody(text: string) {
       return (
         <div
           key={i}
-          className="bg-white/5 border border-white/10 rounded-lg p-4 my-6 text-sm text-gray-500 italic"
+          className="bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-4 my-6 text-sm text-gray-400 italic"
         >
           {p}
         </div>
@@ -66,7 +66,7 @@ function renderBody(text: string) {
     }
 
     return (
-      <p key={i} className="text-base leading-relaxed text-gray-400 mb-4">
+      <p key={i} className="text-[15px] leading-loose text-gray-200 mb-5">
         {p}
       </p>
     );
@@ -113,23 +113,24 @@ export default async function ContentPage({ params }: PageProps) {
             >
               {content.category}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-bold leading-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold leading-tight text-white">
               {content.title}
             </h1>
           </div>
 
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-10 space-y-2 text-sm">
+          <div className="bg-white/[0.04] border border-white/10 rounded-lg p-5 mb-12 space-y-3 text-sm">
             <p>
-              <span className="font-medium text-cyan-400/70">学習目標：</span>
-              <span className="text-gray-300">{content.learningGoal}</span>
+              <span className="font-medium text-cyan-400">学習目標：</span>
+              <span className="text-gray-200">{content.learningGoal}</span>
             </p>
             <p>
-              <span className="font-medium text-cyan-400/70">キーワード：</span>
-              <span className="text-gray-500">{content.keywords}</span>
+              <span className="font-medium text-cyan-400">キーワード：</span>
+              <span className="text-gray-300">{content.keywords}</span>
             </p>
           </div>
 
-          <div className="prose-custom">
+          {/* Article body with reading panel */}
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 sm:p-8">
             {content.body.map((block, i) => (
               <div key={i}>{renderBody(block)}</div>
             ))}
@@ -146,7 +147,7 @@ export default async function ContentPage({ params }: PageProps) {
                 <span className="text-xs text-gray-500 block mb-1">
                   &larr; 前の章
                 </span>
-                <span className="text-sm font-medium line-clamp-1 text-gray-300 group-hover:text-white transition-colors">
+                <span className="text-sm font-medium line-clamp-1 text-gray-200 group-hover:text-white transition-colors">
                   {prev.title}
                 </span>
               </Link>
@@ -161,7 +162,7 @@ export default async function ContentPage({ params }: PageProps) {
                 <span className="text-xs text-gray-500 block mb-1">
                   次の章 &rarr;
                 </span>
-                <span className="text-sm font-medium line-clamp-1 text-gray-300 group-hover:text-white transition-colors">
+                <span className="text-sm font-medium line-clamp-1 text-gray-200 group-hover:text-white transition-colors">
                   {next.title}
                 </span>
               </Link>

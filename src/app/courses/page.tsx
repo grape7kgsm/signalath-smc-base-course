@@ -35,15 +35,15 @@ export default function CoursesPage() {
           </Link>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">
           講座一覧
         </h1>
-        <p className="text-gray-500 text-sm mb-10">
+        <p className="text-gray-400 text-sm mb-10">
           全{contents.length}章 &mdash; SMCの基礎から実践まで
         </p>
 
         <section className="mb-12">
-          <h2 className="text-lg font-semibold mb-4 text-cyan-400/80 tracking-wide">本編</h2>
+          <h2 className="text-lg font-semibold mb-4 text-cyan-400 tracking-wide">本編</h2>
           <div className="space-y-3">
             {mainContents.map((item) => (
               <Link
@@ -56,10 +56,10 @@ export default function CoursesPage() {
                     {item.chapterNumber}
                   </span>
                   <div className="min-w-0">
-                    <h3 className="font-medium text-sm sm:text-base leading-snug text-gray-200 group-hover:text-white transition-colors">
+                    <h3 className="font-medium text-sm sm:text-base leading-snug text-gray-100 group-hover:text-white transition-colors">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                    <p className="text-xs text-gray-400 mt-1 line-clamp-2">
                       {item.summary}
                     </p>
                   </div>
@@ -70,7 +70,7 @@ export default function CoursesPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold mb-4 text-orange-400/80 tracking-wide">特典</h2>
+          <h2 className="text-lg font-semibold mb-4 text-orange-400 tracking-wide">特典</h2>
           <div className="space-y-3">
             {bonusContents.map((item) => (
               <Link
@@ -83,10 +83,10 @@ export default function CoursesPage() {
                     {item.chapterNumber}
                   </span>
                   <div className="min-w-0">
-                    <h3 className="font-medium text-sm sm:text-base leading-snug text-gray-200 group-hover:text-white transition-colors">
+                    <h3 className="font-medium text-sm sm:text-base leading-snug text-gray-100 group-hover:text-white transition-colors">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                    <p className="text-xs text-gray-400 mt-1 line-clamp-2">
                       {item.summary}
                     </p>
                   </div>
