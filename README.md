@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 波動シグナル研究所 - リスクリワード最大化トレード術
 
-## Getting Started
+SMC（スマートマネーコンセプト）を基礎から実践まで学べる無料講座サイト。
 
-First, run the development server:
+## 技術構成
+
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+
+## ローカル開発
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 でアクセスできます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## GitHubへpushする手順
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# 1. GitHubで新しいリポジトリを作成（名前: signalath-smc-base-course）
+# 2. リモートを追加してpush
+cd signalath-smc-base-course
+git remote add origin https://github.com/YOUR_USERNAME/signalath-smc-base-course.git
+git branch -M main
+git push -u origin main
+```
 
-## Learn More
+## Vercelでdeployする手順
 
-To learn more about Next.js, take a look at the following resources:
+1. [Vercel](https://vercel.com) にログイン
+2. 「Add New Project」をクリック
+3. GitHubリポジトリ `signalath-smc-base-course` をimport
+4. Framework Preset は「Next.js」が自動検出される
+5. 「Deploy」をクリック
+6. デプロイ完了後、`https://signalath-smc-base-course.vercel.app` のようなURLが発行される
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## signalath.com/contents を接続する手順
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Vercel側の設定
 
-## Deploy on Vercel
+1. Vercelプロジェクトの Settings > Domains に移動
+2. `signalath.com` を追加
+3. Vercelが表示するDNSレコード情報をメモする
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Cloudflare DNS設定
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+signalath.com のDNSがCloudflareで管理されている場合：
+
+1. Cloudflareダッシュボードで対象ドメインを選択
+2. DNS > Records に移動
+3. 以下のレコードを追加：
+
+| Type  | Name | Content              | Proxy |
+|-------|------|----------------------|-------|
+| CNAME | @    | cname.vercel-dns.com | DNS only (灰色雲) |
+| CNAME | www  | cname.vercel-dns.com | DNS only (灰色雲) |
+
+**重要**: Cloudflareのプロキシ（オレンジ雲）はOFFにし、「DNS only」（灰色雲）にすること。Vercel側でSSL証明書を発行するため、Cloudflareプロキシが有効だとSSLの競合が発生する。
+
+4. Cloudflare SSL/TLS設定を「Full (strict)」にする
+5. Vercel側でドメインの検証が完了するまで数分待つ
+
+### /contents パスについて
+
+Next.js App Router で `/contents` ルートを定義済みのため、`signalath.com/contents` でそのまま講座一覧が表示されます。サブパス設定は不要です。
+
+## サイト構成
+
+- `/` - トップページ（講座への導線）
+- `/contents` - 講座一覧ページ
+- `/contents/[slug]` - 各講座詳細ページ（chapter-1 〜 chapter-14）
+
+## データ更新
+
+講座の内容は `data/contents.json` に格納されています。内容を更新する場合はこのファイルを編集し、再デプロイしてください。
