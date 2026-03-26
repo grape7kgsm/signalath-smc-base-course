@@ -1,78 +1,89 @@
 import Link from "next/link";
-import type { Metadata } from "next";
-import { getAllContents } from "@/lib/contents";
 
-export const metadata: Metadata = {
-  title: "講座一覧",
-  description:
-    "SMC（スマートマネーコンセプト）を基礎から実践まで学べる全14章の講座一覧。",
-};
-
-export default function ContentsPage() {
-  const contents = getAllContents();
-  const mainContents = contents.filter((c) => c.category === "本編");
-  const bonusContents = contents.filter((c) => c.category === "特典");
-
+export default function Home() {
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12 sm:py-16">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-2">講座一覧</h1>
-      <p className="text-gray-500 text-sm mb-10">
-        全{contents.length}章 &mdash; SMCの基礎から実践まで
-      </p>
+    <main className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0a0a0f]">
+      {/* Grid background */}
+      <div
+        className="absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
 
-      <section className="mb-12">
-        <h2 className="text-lg font-semibold mb-4 text-gray-800">本編</h2>
-        <div className="space-y-3">
-          {mainContents.map((item) => (
-            <Link
-              key={item.slug}
-              href={`/${item.slug}`}
-              className="block border border-gray-200 rounded-lg p-4 hover:border-gray-400 hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
-                  {item.chapterNumber}
-                </span>
-                <div className="min-w-0">
-                  <h3 className="font-medium text-sm sm:text-base leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                    {item.summary}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Radial glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-500/10 blur-[120px]" />
+      <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] rounded-full bg-cyan-500/8 blur-[100px]" />
 
-      <section>
-        <h2 className="text-lg font-semibold mb-4 text-gray-800">特典</h2>
-        <div className="space-y-3">
-          {bonusContents.map((item) => (
-            <Link
-              key={item.slug}
-              href={`/${item.slug}`}
-              className="block border border-orange-200 rounded-lg p-4 hover:border-orange-400 hover:bg-orange-50 transition-colors"
-            >
-              <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-sm font-medium text-orange-600">
-                  {item.chapterNumber}
-                </span>
-                <div className="min-w-0">
-                  <h3 className="font-medium text-sm sm:text-base leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                    {item.summary}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          ))}
+      {/* Accent lines */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-b from-transparent via-cyan-500/40 to-transparent" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-t from-transparent via-blue-500/40 to-transparent" />
+
+      {/* Content */}
+      <div className="relative z-10 text-center px-6 max-w-2xl">
+        {/* Tag */}
+        <div className="inline-flex items-center gap-2 border border-white/10 rounded-full px-4 py-1.5 mb-8">
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          <span className="text-xs text-gray-400 tracking-widest uppercase">
+            Free Course
+          </span>
         </div>
-      </section>
+
+        {/* Title */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-4">
+          <span className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+            Smart Money
+          </span>
+          <br />
+          <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            Concept
+          </span>
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-base sm:text-lg text-gray-400 mb-2 tracking-wide">
+          〜機関投資家の思考の裏側〜
+        </p>
+
+        {/* Divider */}
+        <div className="w-16 h-px bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent mx-auto my-8" />
+
+        {/* Description */}
+        <p className="text-sm text-gray-500 leading-relaxed mb-12 max-w-md mx-auto">
+          マーケットを動かす本当のプレイヤーの視点を手に入れる。
+          <br />
+          全14章の無料講座で、SMCの本質を体系的に学ぶ。
+        </p>
+
+        {/* CTA Button */}
+        <Link
+          href="/courses"
+          className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-10 py-4 rounded-lg text-sm font-semibold tracking-wide transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.3)] hover:scale-[1.02]"
+        >
+          <span>講座をスタートする</span>
+          <svg
+            className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </Link>
+      </div>
+
+      {/* Bottom decorative dots */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5">
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className="w-1 h-1 rounded-full bg-gray-600"
+          />
+        ))}
+      </div>
     </main>
   );
 }

@@ -84,7 +84,7 @@ export default async function ContentPage({ params }: PageProps) {
     <main className="max-w-3xl mx-auto px-4 py-12 sm:py-16">
       <div className="mb-8">
         <Link
-          href="/"
+          href="/courses"
           className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
         >
           &larr; 講座一覧に戻る
