@@ -187,6 +187,13 @@ function renderBlock(block: string, blockIndex: number) {
       );
     }
 
+    // Multi-line block containing images → render line by line
+    if (lines.length > 1 && trimmed.includes("![")) {
+      return (
+        <div key={key}>{renderSubContent(trimmed, key)}</div>
+      );
+    }
+
     // Regular paragraph
     return (
       <p
