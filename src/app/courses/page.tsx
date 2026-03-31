@@ -5,7 +5,7 @@ import { getAllContents } from "@/lib/contents";
 export const metadata: Metadata = {
   title: "講座一覧",
   description:
-    "SMC（スマートマネーコンセプト）を基礎から実践まで学べる全14章の講座一覧。",
+    "SMC（スマートマネーコンセプト）を基礎から実践まで学べる全15章の講座一覧。",
 };
 
 export default function CoursesPage() {

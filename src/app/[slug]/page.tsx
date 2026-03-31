@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
@@ -122,6 +123,22 @@ function renderBlock(block: string, blockIndex: number) {
       return renderCompareBox(trimmed, key);
     }
 
+    // Image: ![alt](/path)
+    const imgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imgMatch) {
+      return (
+        <div key={key} className="my-6">
+          <Image
+            src={imgMatch[2]}
+            alt={imgMatch[1]}
+            width={800}
+            height={450}
+            className="rounded-lg w-full h-auto"
+          />
+        </div>
+      );
+    }
+
     // Diagram placeholder
     if (trimmed.startsWith("【図解】")) {
       return (
@@ -136,6 +153,22 @@ function renderBlock(block: string, blockIndex: number) {
 
     // Bullet list: all lines start with -
     const lines = trimmed.split("\n");
+    if (lines.length === 1) {
+      const singleImgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+      if (singleImgMatch) {
+        return (
+          <div key={key} className="my-6">
+            <Image
+              src={singleImgMatch[2]}
+              alt={singleImgMatch[1]}
+              width={800}
+              height={450}
+              className="rounded-lg w-full h-auto"
+            />
+          </div>
+        );
+      }
+    }
     if (lines.every((l) => l.startsWith("- "))) {
       return (
         <ul key={key} className="my-5 space-y-2.5 pl-1">
@@ -200,7 +233,20 @@ function renderSubContent(text: string, parentKey: string) {
       currentBullets.push(line.slice(2));
     } else {
       flushBullets();
-      if (line.trim()) {
+      const imgMatch = line.trim().match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+      if (imgMatch) {
+        elements.push(
+          <div key={`${parentKey}-img-${elements.length}`} className="my-6">
+            <Image
+              src={imgMatch[2]}
+              alt={imgMatch[1]}
+              width={800}
+              height={450}
+              className="rounded-lg w-full h-auto"
+            />
+          </div>
+        );
+      } else if (line.trim()) {
         elements.push(
           <p
             key={`${parentKey}-p-${elements.length}`}
