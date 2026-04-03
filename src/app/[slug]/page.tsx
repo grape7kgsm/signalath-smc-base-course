@@ -44,192 +44,173 @@ function renderInline(text: string) {
   });
 }
 
+function renderImage(src: string, alt: string, key: string) {
+  const isExternal = src.startsWith("http");
+  return (
+    <div key={key} className="my-8">
+      {isExternal ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          className="rounded-lg w-full h-auto"
+        />
+      ) : (
+        <Image
+          src={src}
+          alt={alt}
+          width={800}
+          height={450}
+          className="rounded-lg w-full h-auto"
+        />
+      )}
+    </div>
+  );
+}
+
 function renderBlock(block: string, blockIndex: number) {
-  const paragraphs = block.split("\n\n");
-  return paragraphs.map((p, i) => {
-    const key = `${blockIndex}-${i}`;
-    const trimmed = p.trim();
+  const key = `b${blockIndex}`;
+  const trimmed = block.trim();
 
-    // h2: standalone **bold line**
-    const h2Match = trimmed.match(/^\*\*(.+?)\*\*$/);
-    if (h2Match) {
-      return (
-        <h2
-          key={key}
-          className="text-lg sm:text-xl font-bold mt-14 mb-5 text-white border-l-2 border-cyan-500 pl-3"
-        >
-          {h2Match[1]}
-        </h2>
-      );
-    }
+  if (!trimmed) return null;
 
-    // h2 + following text
-    const h2Content = trimmed.match(/^\*\*(.+?)\*\*\n([\s\S]+)$/);
-    if (h2Content) {
-      const rest = h2Content[2];
-      return (
-        <div key={key}>
-          <h2 className="text-lg sm:text-xl font-bold mt-14 mb-5 text-white border-l-2 border-cyan-500 pl-3">
-            {h2Content[1]}
-          </h2>
-          {renderSubContent(rest, key)}
-        </div>
-      );
-    }
+  // Separator line (====)
+  if (/^={3,}$/.test(trimmed)) {
+    return <hr key={key} className="border-white/10 my-10" />;
+  }
 
-    // h3: ### heading
-    if (trimmed.startsWith("### ")) {
-      return (
-        <h3
-          key={key}
-          className="text-base sm:text-lg font-semibold mt-10 mb-4 text-cyan-300"
-        >
-          {trimmed.slice(4)}
-        </h3>
-      );
-    }
-
-    // Summary box: starts with 📋
-    if (trimmed.startsWith("📋")) {
-      return renderSummaryBox(trimmed, key);
-    }
-
-    // Warning callout: starts with ⚠️
-    if (trimmed.startsWith("⚠️")) {
-      return (
-        <div
-          key={key}
-          className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 my-6 text-sm"
-        >
-          <p className="text-amber-300">{renderInline(trimmed)}</p>
-        </div>
-      );
-    }
-
-    // Check callout: starts with ✅
-    if (trimmed.startsWith("✅")) {
-      return (
-        <div
-          key={key}
-          className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 my-6 text-sm"
-        >
-          <p className="text-emerald-300">{renderInline(trimmed)}</p>
-        </div>
-      );
-    }
-
-    // Comparison block: starts with ⚖️
-    if (trimmed.startsWith("⚖️")) {
-      return renderCompareBox(trimmed, key);
-    }
-
-    // Image: ![alt](/path) or ![alt](https://...)
-    const imgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
-    if (imgMatch) {
-      const src = imgMatch[2];
-      const alt = imgMatch[1];
-      const isExternal = src.startsWith("http");
-      return (
-        <div key={key} className="my-6">
-          {isExternal ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={src}
-              alt={alt}
-              loading="lazy"
-              className="rounded-lg w-full h-auto"
-            />
-          ) : (
-            <Image
-              src={src}
-              alt={alt}
-              width={800}
-              height={450}
-              className="rounded-lg w-full h-auto"
-            />
-          )}
-        </div>
-      );
-    }
-
-    // Diagram placeholder
-    if (trimmed.startsWith("【図解】")) {
-      return (
-        <div
-          key={key}
-          className="bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-4 my-6 text-sm text-gray-400 italic"
-        >
-          {trimmed}
-        </div>
-      );
-    }
-
-    // Bullet list: all lines start with -
-    const lines = trimmed.split("\n");
-    if (lines.length === 1) {
-      const singleImgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
-      if (singleImgMatch) {
-        const singleSrc = singleImgMatch[2];
-        const singleAlt = singleImgMatch[1];
-        const singleIsExt = singleSrc.startsWith("http");
-        return (
-          <div key={key} className="my-6">
-            {singleIsExt ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={singleSrc}
-                alt={singleAlt}
-                loading="lazy"
-                className="rounded-lg w-full h-auto"
-              />
-            ) : (
-              <Image
-                src={singleSrc}
-                alt={singleAlt}
-                width={800}
-                height={450}
-                className="rounded-lg w-full h-auto"
-              />
-            )}
-          </div>
-        );
-      }
-    }
-    if (lines.every((l) => l.startsWith("- "))) {
-      return (
-        <ul key={key} className="my-5 space-y-2.5 pl-1">
-          {lines.map((l, li) => (
-            <li
-              key={li}
-              className="flex items-start gap-2.5 text-[15px] leading-relaxed text-gray-200"
-            >
-              <span className="text-cyan-500 mt-1.5 flex-shrink-0 text-[8px]">
-                ●
-              </span>
-              <span>{renderInline(l.slice(2))}</span>
-            </li>
-          ))}
-        </ul>
-      );
-    }
-
-    // Multi-line block containing images → render line by line
-    if (lines.length > 1 && trimmed.includes("![")) {
-      return (
-        <div key={key}>{renderSubContent(trimmed, key)}</div>
-      );
-    }
-
-    // Regular paragraph
+  // ■ Section header (Notion-style)
+  if (trimmed.startsWith("■")) {
     return (
-      <p
+      <h2
         key={key}
-        className="text-[15px] leading-[1.9] text-gray-200 mb-5"
+        className="text-lg sm:text-xl font-bold mt-12 mb-6 text-white border-l-2 border-cyan-500 pl-3"
       >
-        {renderInline(trimmed)}
-      </p>
+        {trimmed.slice(2).trim()}
+      </h2>
     );
-  });
+  }
+
+  // h2: standalone **bold line**
+  const h2Match = trimmed.match(/^\*\*(.+?)\*\*$/);
+  if (h2Match) {
+    return (
+      <h2
+        key={key}
+        className="text-lg sm:text-xl font-bold mt-12 mb-6 text-white border-l-2 border-cyan-500 pl-3"
+      >
+        {h2Match[1]}
+      </h2>
+    );
+  }
+
+  // h2 + following text
+  const h2Content = trimmed.match(/^\*\*(.+?)\*\*\n([\s\S]+)$/);
+  if (h2Content) {
+    return (
+      <div key={key}>
+        <h2 className="text-lg sm:text-xl font-bold mt-12 mb-6 text-white border-l-2 border-cyan-500 pl-3">
+          {h2Content[1]}
+        </h2>
+        {renderSubContent(h2Content[2], key)}
+      </div>
+    );
+  }
+
+  // h3: ### heading
+  if (trimmed.startsWith("### ")) {
+    return (
+      <h3
+        key={key}
+        className="text-base sm:text-lg font-semibold mt-10 mb-4 text-cyan-300"
+      >
+        {trimmed.slice(4)}
+      </h3>
+    );
+  }
+
+  // Summary box: 📋
+  if (trimmed.startsWith("📋")) {
+    return renderSummaryBox(trimmed, key);
+  }
+
+  // Warning callout: ⚠️
+  if (trimmed.startsWith("⚠️")) {
+    return (
+      <div
+        key={key}
+        className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 my-8 text-sm"
+      >
+        <p className="text-amber-300 leading-relaxed">{renderInline(trimmed)}</p>
+      </div>
+    );
+  }
+
+  // Check callout: ✅
+  if (trimmed.startsWith("✅")) {
+    return (
+      <div
+        key={key}
+        className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 my-8 text-sm"
+      >
+        <p className="text-emerald-300 leading-relaxed">{renderInline(trimmed)}</p>
+      </div>
+    );
+  }
+
+  // Comparison block: ⚖️
+  if (trimmed.startsWith("⚖️")) {
+    return renderCompareBox(trimmed, key);
+  }
+
+  // Image: ![alt](url)
+  const imgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+  if (imgMatch) {
+    return renderImage(imgMatch[2], imgMatch[1], key);
+  }
+
+  // Diagram placeholder
+  if (trimmed.startsWith("【図解】")) {
+    return null;
+  }
+
+  // Bullet list: all lines start with -
+  const lines = trimmed.split("\n");
+  if (lines.every((l) => l.startsWith("- "))) {
+    return (
+      <ul key={key} className="my-6 space-y-3 pl-1">
+        {lines.map((l, li) => (
+          <li
+            key={li}
+            className="flex items-start gap-2.5 text-[15px] leading-relaxed text-gray-200"
+          >
+            <span className="text-cyan-500 mt-1.5 flex-shrink-0 text-[8px]">
+              ●
+            </span>
+            <span>{renderInline(l.slice(2))}</span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  // Multi-line block containing images
+  if (lines.length > 1 && trimmed.includes("![")) {
+    return (
+      <div key={key}>{renderSubContent(trimmed, key)}</div>
+    );
+  }
+
+  // Regular paragraph - generous spacing for mobile readability
+  return (
+    <p
+      key={key}
+      className="text-[15px] leading-[2.0] text-gray-200 mb-4"
+    >
+      {renderInline(trimmed)}
+    </p>
+  );
 }
 
 function renderSubContent(text: string, parentKey: string) {
@@ -296,7 +277,7 @@ function renderSubContent(text: string, parentKey: string) {
         elements.push(
           <p
             key={`${parentKey}-p-${elements.length}`}
-            className="text-[15px] leading-[1.9] text-gray-200 mb-5"
+            className="text-[15px] leading-[2.0] text-gray-200 mb-4"
           >
             {renderInline(line)}
           </p>
