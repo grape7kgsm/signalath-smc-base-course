@@ -123,18 +123,31 @@ function renderBlock(block: string, blockIndex: number) {
       return renderCompareBox(trimmed, key);
     }
 
-    // Image: ![alt](/path)
+    // Image: ![alt](/path) or ![alt](https://...)
     const imgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
     if (imgMatch) {
+      const src = imgMatch[2];
+      const alt = imgMatch[1];
+      const isExternal = src.startsWith("http");
       return (
         <div key={key} className="my-6">
-          <Image
-            src={imgMatch[2]}
-            alt={imgMatch[1]}
-            width={800}
-            height={450}
-            className="rounded-lg w-full h-auto"
-          />
+          {isExternal ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={src}
+              alt={alt}
+              loading="lazy"
+              className="rounded-lg w-full h-auto"
+            />
+          ) : (
+            <Image
+              src={src}
+              alt={alt}
+              width={800}
+              height={450}
+              className="rounded-lg w-full h-auto"
+            />
+          )}
         </div>
       );
     }
@@ -156,15 +169,28 @@ function renderBlock(block: string, blockIndex: number) {
     if (lines.length === 1) {
       const singleImgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
       if (singleImgMatch) {
+        const singleSrc = singleImgMatch[2];
+        const singleAlt = singleImgMatch[1];
+        const singleIsExt = singleSrc.startsWith("http");
         return (
           <div key={key} className="my-6">
-            <Image
-              src={singleImgMatch[2]}
-              alt={singleImgMatch[1]}
-              width={800}
-              height={450}
-              className="rounded-lg w-full h-auto"
-            />
+            {singleIsExt ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={singleSrc}
+                alt={singleAlt}
+                loading="lazy"
+                className="rounded-lg w-full h-auto"
+              />
+            ) : (
+              <Image
+                src={singleSrc}
+                alt={singleAlt}
+                width={800}
+                height={450}
+                className="rounded-lg w-full h-auto"
+              />
+            )}
           </div>
         );
       }
@@ -242,15 +268,28 @@ function renderSubContent(text: string, parentKey: string) {
       flushBullets();
       const imgMatch = line.trim().match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
       if (imgMatch) {
+        const imgSrc = imgMatch[2];
+        const imgAlt = imgMatch[1];
+        const isExt = imgSrc.startsWith("http");
         elements.push(
           <div key={`${parentKey}-img-${elements.length}`} className="my-6">
-            <Image
-              src={imgMatch[2]}
-              alt={imgMatch[1]}
-              width={800}
-              height={450}
-              className="rounded-lg w-full h-auto"
-            />
+            {isExt ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imgSrc}
+                alt={imgAlt}
+                loading="lazy"
+                className="rounded-lg w-full h-auto"
+              />
+            ) : (
+              <Image
+                src={imgSrc}
+                alt={imgAlt}
+                width={800}
+                height={450}
+                className="rounded-lg w-full h-auto"
+              />
+            )}
           </div>
         );
       } else if (line.trim()) {
