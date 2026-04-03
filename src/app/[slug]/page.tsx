@@ -202,11 +202,34 @@ function renderBlock(block: string, blockIndex: number) {
     );
   }
 
-  // Regular paragraph - generous spacing for mobile readability
+  // Multi-line grouped paragraph (sentences grouped by Notion empty-block separators)
+  // Lines within a group are rendered with tight spacing; the group itself has generous outer margin
+  if (lines.length > 1) {
+    return (
+      <div key={key} className="mb-8">
+        {lines.map((line, li) => {
+          const lineImg = line.trim().match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+          if (lineImg) {
+            return renderImage(lineImg[2], lineImg[1], `${key}-${li}`);
+          }
+          return (
+            <p
+              key={`${key}-${li}`}
+              className="text-[15px] leading-[2.0] text-gray-200 mb-1.5"
+            >
+              {renderInline(line)}
+            </p>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Single-line paragraph (standalone sentence between groups) — extra breathing room
   return (
     <p
       key={key}
-      className="text-[15px] leading-[2.0] text-gray-200 mb-4"
+      className="text-[15px] leading-[2.0] text-gray-200 mb-8"
     >
       {renderInline(trimmed)}
     </p>
