@@ -12,6 +12,22 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/apply",
+          destination: "https://signalath.com/freecontents/apply",
+          basePath: false,
+        },
+        {
+          source: "/api/apply",
+          destination: "https://signalath.com/freecontents/api/apply",
+          basePath: false,
+        },
+      ],
+    };
+  },
   images: {
     remotePatterns: [
       {

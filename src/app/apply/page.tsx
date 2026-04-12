@@ -38,7 +38,7 @@ export default function ApplyPage() {
     setSubmitting(true);
     setError("");
     try {
-      const res = await fetch("/freecontents/api/apply", {
+      const res = await fetch("/api/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -69,7 +69,7 @@ export default function ApplyPage() {
             <br /><br />
             Discordの <span className="text-cyan-400">#完了_昇格告知</span> チャンネルで通知されますので、お待ちください。
           </p>
-          <a href="/freecontents" className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
+          <a href="/" className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
