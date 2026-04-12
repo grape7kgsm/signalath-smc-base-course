@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const databaseId = process.env.NOTION_APPLY_DB_ID;
 
     if (!notionApiKey || !databaseId) {
-      return NextResponse.json({ error: "サーバー設定エラー", debug: { hasKey: !!notionApiKey, hasDb: !!databaseId } }, { status: 500 });
+      return NextResponse.json({ error: "サーバー設定エラー" }, { status: 500 });
     }
 
     const res = await fetch("https://api.notion.com/v1/pages", {
@@ -57,7 +57,8 @@ export async function POST(request: Request) {
 
     if (!res.ok) {
       const err = await res.text();
-      return NextResponse.json({ error: "データ保存に失敗しました", debug: err }, { status: 500 });
+      console.error("Notion API error:", err);
+      return NextResponse.json({ error: "データ保存に失敗しました" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
