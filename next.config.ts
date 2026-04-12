@@ -2,6 +2,16 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   basePath: "/freecontents",
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/freecontents",
+        basePath: false,
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
