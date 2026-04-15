@@ -25,6 +25,16 @@ const nextConfig: NextConfig = {
           destination: "https://signalath.com/freecontents/api/apply",
           basePath: false,
         },
+        {
+          source: "/offer",
+          destination: "https://signalath.com/freecontents/offer",
+          basePath: false,
+        },
+        {
+          source: "/offer/:path*",
+          destination: "https://signalath.com/freecontents/offer/:path*",
+          basePath: false,
+        },
       ],
     };
   },
