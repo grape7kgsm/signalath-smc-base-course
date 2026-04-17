@@ -114,11 +114,11 @@ export default function ApplyPage() {
               </p>
               <button
                 type="button"
-                onClick={() => setShowDisclaimer(true)}
+                onClick={() => setShowDisclaimer(!showDisclaimer)}
                 className="inline-flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 mt-3 transition-colors"
               >
-                注意事項を読む
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                {showDisclaimer ? "注意事項を閉じる" : "注意事項を読む"}
+                <svg className={`w-3 h-3 transition-transform ${showDisclaimer ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
