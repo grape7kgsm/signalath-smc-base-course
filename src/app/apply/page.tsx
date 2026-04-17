@@ -23,6 +23,7 @@ export default function ApplyPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   const isValid =
     form.agreed &&
@@ -111,18 +112,35 @@ export default function ApplyPage() {
                 暗号資産・海外取引所およびコミュニティの利用に関する注意事項をお読みください。
                 本注意事項を十分に理解していないことによって生じる一切の責任は、すべてご本人にあります。
               </p>
-              <a
-                href="https://note.com/chart_shingan/n/n819e4135e693"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => setShowDisclaimer(true)}
                 className="inline-flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 mt-3 transition-colors"
               >
                 注意事項を読む
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
-              </a>
+              </button>
             </div>
+            {showDisclaimer && (
+              <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-4 text-xs text-gray-400 leading-relaxed space-y-3">
+                <p className="font-semibold text-white">波動シグナル研究所 利用に関する注意事項</p>
+                <p>本コミュニティおよびインジケーターの利用にあたり、以下の注意事項を十分にご理解ください。</p>
+                <p><span className="text-gray-300 font-medium">1. 投資リスクについて</span><br />FX・暗号資産・株式等の取引は元本割れのリスクがあります。インジケーターのシグナルは将来の利益を保証するものではありません。投資判断はすべてご自身の責任で行ってください。</p>
+                <p><span className="text-gray-300 font-medium">2. 海外取引所の利用について</span><br />本サービスでは海外取引所（Axon Markets）の口座開設をご案内しています。海外取引所の利用に伴うリスク（規制変更、出金制限等）はご自身でご理解のうえご利用ください。</p>
+                <p><span className="text-gray-300 font-medium">3. インジケーターの利用について</span><br />インジケーターは教育・参考目的で提供されます。過去の実績は将来の成果を保証しません。シグナルに基づく取引で発生した損失について、当方は一切の責任を負いません。</p>
+                <p><span className="text-gray-300 font-medium">4. 権限の管理について</span><br />登録口座以外での取引、長期未使用、不正利用が確認された場合、インジケーターの権限は予告なく回収される場合があります。</p>
+                <p><span className="text-gray-300 font-medium">5. 個人情報について</span><br />申請時にご入力いただいた情報（口座番号、Discord ID、TradingView ID）はインジケーター権限の付与・管理にのみ使用し、第三者に提供することはありません。</p>
+                <button
+                  type="button"
+                  onClick={() => setShowDisclaimer(false)}
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors mt-2"
+                >
+                  閉じる
+                </button>
+              </div>
+            )}
             <Checkbox
               checked={form.agreed}
               onChange={(v) => setForm({ ...form, agreed: v })}
@@ -219,7 +237,7 @@ export default function ApplyPage() {
   );
 }
 
-/* ─── Sub-components ─── */
+/* --- Sub-components --- */
 
 function Section({ title, required, children }: { title: string; required?: boolean; children: React.ReactNode }) {
   return (
@@ -235,7 +253,10 @@ function Section({ title, required, children }: { title: string; required?: bool
 
 function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
-    <label className="flex items-start gap-3 cursor-pointer group">
+    <div
+      onClick={() => onChange(!checked)}
+      className="flex items-start gap-3 cursor-pointer group"
+    >
       <div className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${checked ? "bg-cyan-500 border-cyan-500" : "border-gray-600 group-hover:border-gray-400"}`}>
         {checked && (
           <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -244,7 +265,7 @@ function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v
         )}
       </div>
       <span className="text-sm text-gray-300">{label}</span>
-    </label>
+    </div>
   );
 }
 
@@ -264,12 +285,16 @@ function RadioGroup({ value, onChange, options }: { value: string; onChange: (v:
   return (
     <div className="space-y-3">
       {options.map((opt) => (
-        <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
+        <div
+          key={opt.value}
+          onClick={() => onChange(opt.value)}
+          className="flex items-center gap-3 cursor-pointer group"
+        >
           <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${value === opt.value ? "border-cyan-500" : "border-gray-600 group-hover:border-gray-400"}`}>
             {value === opt.value && <div className="w-2.5 h-2.5 rounded-full bg-cyan-500" />}
           </div>
           <span className="text-sm text-gray-300">{opt.label}</span>
-        </label>
+        </div>
       ))}
     </div>
   );
