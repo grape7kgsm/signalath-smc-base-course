@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "サーバー設定エラー" }, { status: 500 });
     }
 
+    // 1. Notion DBに保存
     const res = await fetch("https://api.notion.com/v1/pages", {
       method: "POST",
       headers: {
@@ -59,6 +60,34 @@ export async function POST(request: Request) {
       const err = await res.text();
       console.error("Notion API error:", err);
       return NextResponse.json({ error: "データ保存に失敗しました" }, { status: 500 });
+    }
+
+    // 2. Discordの #申請_指標権限 に自動投稿 → Botが拾って権限付与
+    const discordWebhookUrl = process.env.DISCORD_APPLY_WEBHOOK_URL;
+    if (discordWebhookUrl) {
+      const depositLabel = depositStatus === "completed" ? "入金済み" : "入金予定";
+      const discordMessage =
+        `📋 **申請フォーム自動送信**\n` +
+        `ブローカー：Axon\n` +
+        `口座番号：${accountNumber}\n` +
+        `TradingView ID：${tradingViewId}\n` +
+        `Discord ID：${discordId}\n` +
+        `デポジット：${depositLabel}\n` +
+        `申請完了`;
+
+      try {
+        await fetch(discordWebhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: "申請フォーム",
+            content: discordMessage,
+          }),
+        });
+      } catch (webhookErr) {
+        // Discord投稿失敗はフォーム送信自体の失敗にはしない
+        console.error("Discord webhook error:", webhookErr);
+      }
     }
 
     return NextResponse.json({ success: true });

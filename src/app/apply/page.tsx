@@ -65,9 +65,9 @@ export default function ApplyPage() {
           </div>
           <h1 className="text-2xl font-bold text-white mb-4">申請を受け付けました</h1>
           <p className="text-gray-400 text-sm leading-relaxed mb-6">
-            申請内容を確認後、最大24時間以内にTradingViewのインジケーター権限を付与いたします。
+            申請内容は自動処理されます。通常、数分以内にTradingViewのインジケーター権限が付与されます。
             <br /><br />
-            Discordの <span className="text-cyan-400">#完了_昇格告知</span> チャンネルで通知されますので、お待ちください。
+            Discordの <span className="text-cyan-400">#完了_昇格告知</span> チャンネルで通知されますので、ご確認ください。
           </p>
           <a href="/" className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
