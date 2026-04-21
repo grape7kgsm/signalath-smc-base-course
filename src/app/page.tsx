@@ -1,4 +1,4 @@
-import Link from "next/link";
+import GateForm from "./_components/GateForm";
 
 export default function Home() {
   return (
@@ -57,22 +57,8 @@ export default function Home() {
           全15章の無料講座で、SMCの本質を体系的に学ぶ。
         </p>
 
-        {/* CTA Button */}
-        <Link
-          href="/courses"
-          className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-10 py-4 rounded-lg text-sm font-semibold tracking-wide transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.3)] hover:scale-[1.02]"
-        >
-          <span>講座をスタートする</span>
-          <svg
-            className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-          </svg>
-        </Link>
+        {/* Gate: Discord ID verification */}
+        <GateForm />
       </div>
 
       {/* Bottom decorative dots */}
