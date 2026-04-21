@@ -54,7 +54,7 @@ export default function Home() {
         <p className="text-sm text-gray-500 leading-relaxed mb-12 max-w-md mx-auto">
           マーケットを動かす本当のプレイヤーの視点を手に入れる。
           <br />
-          全14章の無料講座で、SMCの本質を体系的に学ぶ。
+          全15章の無料講座で、SMCの本質を体系的に学ぶ。
         </p>
 
         {/* CTA Button */}
