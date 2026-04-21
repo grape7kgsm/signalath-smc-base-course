@@ -3,9 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+const USERNAME_RE = /^[a-z0-9_.]{2,32}$/;
+const ERROR_MESSAGE =
+  "Discordユーザー名が違います。参加後に正しいユーザー名を入力してください";
+
 export default function GateForm() {
   const router = useRouter();
-  const [discordId, setDiscordId] = useState("");
+  const [username, setUsername] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -14,9 +18,9 @@ export default function GateForm() {
     e.preventDefault();
     setError(null);
 
-    const trimmed = discordId.trim();
-    if (!/^\d{17,20}$/.test(trimmed)) {
-      setError("DiscordIDが違います。参加後に正しいIDを入力してください");
+    const normalized = username.trim().toLowerCase();
+    if (!USERNAME_RE.test(normalized)) {
+      setError(ERROR_MESSAGE);
       return;
     }
 
@@ -25,16 +29,16 @@ export default function GateForm() {
       const res = await fetch("/freecontents/api/gate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ discordId: trimmed }),
+        body: JSON.stringify({ username: normalized }),
       });
       if (res.ok) {
         router.push("/courses");
         router.refresh();
         return;
       }
-      setError("DiscordIDが違います。参加後に正しいIDを入力してください");
+      setError(ERROR_MESSAGE);
     } catch {
-      setError("DiscordIDが違います。参加後に正しいIDを入力してください");
+      setError(ERROR_MESSAGE);
     } finally {
       setSubmitting(false);
     }
@@ -44,16 +48,16 @@ export default function GateForm() {
     <div className="w-full max-w-sm mx-auto">
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <label className="text-[10px] tracking-[0.3em] uppercase text-cyan-300/80 text-left">
-          Discord ID
+          Discord ユーザー名
         </label>
         <input
           type="text"
-          inputMode="numeric"
-          pattern="\d*"
           autoComplete="off"
-          value={discordId}
-          onChange={(e) => setDiscordId(e.target.value.replace(/[^\d]/g, ""))}
-          placeholder="例: 123456789012345678"
+          autoCapitalize="none"
+          spellCheck={false}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="例: yamada_taro"
           className="w-full bg-white/[0.03] border border-white/15 focus:border-cyan-400/60 focus:outline-none px-4 py-3 text-white text-sm tracking-wider placeholder-gray-600 transition-colors"
           disabled={submitting}
         />
@@ -91,18 +95,28 @@ export default function GateForm() {
         onClick={() => setShowHelp((v) => !v)}
         className="mt-4 text-[11px] text-gray-500 hover:text-cyan-300 transition-colors underline decoration-dotted underline-offset-4"
       >
-        {showHelp ? "ID確認方法を閉じる" : "Discord IDの確認方法"}
+        {showHelp ? "確認方法を閉じる" : "ユーザー名の確認方法"}
       </button>
 
       {showHelp && (
         <div className="mt-3 text-left text-[11px] text-gray-400 leading-relaxed border border-white/10 bg-white/[0.02] p-3">
-          <p className="text-cyan-300 mb-1.5 tracking-wide">確認手順（スマホ/PC共通）</p>
+          <p className="text-cyan-300 mb-1.5 tracking-wide">
+            確認手順（スマホ/PC共通）
+          </p>
           <ol className="list-decimal list-inside space-y-1">
-            <li>Discord設定 → 詳細設定 → <span className="text-gray-200">開発者モード</span>をON</li>
-            <li>自分のアイコンを長押し（PCは右クリック）</li>
-            <li><span className="text-gray-200">「ユーザーIDをコピー」</span>をタップ</li>
+            <li>Discordを開く → 自分のアイコンをタップ</li>
+            <li>
+              <span className="text-gray-200">「アカウント」</span>
+              （ユーザープロフィール）を開く
+            </li>
+            <li>
+              <span className="text-gray-200">「ユーザー名」</span>
+              欄の英数字（表示名ではない）を入力
+            </li>
           </ol>
-          <p className="text-gray-500 mt-2">17〜19桁の数字がコピーされます。</p>
+          <p className="text-gray-500 mt-2">
+            英小文字・数字・<code>_</code>・<code>.</code>のみ。大文字は自動で小文字に変換されます。
+          </p>
         </div>
       )}
     </div>
