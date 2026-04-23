@@ -463,15 +463,26 @@ const PRE_DONE_IDS = [
   'annot_usdjpy_1d_horizontal-lines','annot_usdjpy_1d_trendline-up','annot_usdjpy_1d_trendline-down',
   'annot_usdjpy_1d_ma200','annot_usdjpy_1d_ma-multi','annot_usdjpy_1d_bollinger',
   'annot_usdjpy_1d_rsi','annot_usdjpy_1d_macd','annot_usdjpy_1d_all-indicators',
-  // 04_indicators — 2026-04-23 チャットで運営者承認済み（#63-#70）
-  'ind_fibonacci_usdjpy_1d',         // #63
-  'ind_fibonacci_xauusd_1d',         // #64
-  'ind_ema-vs-sma_usdjpy_4h',        // #65
-  'ind_golden-cross_usdjpy_1d',      // #66
-  'ind_dead-cross_usdjpy_1d',        // #67
-  'ind_rsi-divergence_usdjpy_4h',    // #68
-  'ind_pivot-points_usdjpy_1h',      // #69
-  'ind_parabolic-sar_usdjpy_4h',     // #70
+  // 04_indicators — 2026-04-23 チャットで運営者承認済み
+  'ind_fibonacci_usdjpy_1d',
+  'ind_fibonacci_xauusd_1d',
+  'ind_ema-vs-sma_usdjpy_4h',
+  'ind_golden-cross_usdjpy_1d',
+  'ind_dead-cross_usdjpy_1d',
+  'ind_rsi-divergence_usdjpy_4h',
+  'ind_pivot-points_usdjpy_1h',
+  'ind_parabolic-sar_usdjpy_4h',
+  // 2026-04-23 追加: JSONLログから復元した10件
+  'ind_vwap_usdjpy_5m',
+  'ind_zigzag_usdjpy_4h',
+  'ind_zigzag_xauusd_1d',
+  'ind_atr_usdjpy_4h',
+  'ind_atr_xauusd_1h',
+  'ind_rci_usdjpy_4h',
+  'ind_heikin-ashi_usdjpy_4h',
+  'ind_heikin-ashi_comparison',
+  'ind_ichimoku_usdjpy_4h',
+  'ind_stochastic_usdjpy_4h',
 ];
 let state = {};
 try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){}
