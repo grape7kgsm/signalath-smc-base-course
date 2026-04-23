@@ -444,8 +444,9 @@ const items = [
 ];
 
 const STORAGE_KEY = 'hado-shooting-checklist-v1';
-const PREFILL_KEY = 'hado-shooting-checklist-prefilled-v2';
-// 2026-04-23 時点でローカルにファイルが存在する or チャットで承認済みの項目を初回訪問時に自動チェック
+const PREFILL_APPLIED_KEY = 'hado-shooting-checklist-prefilled-ids';
+// ローカルにファイルが存在する or チャットで承認済みの項目を初回訪問時に自動チェック
+// IDを追加した場合は次回訪問時に追加分のみ適用される（運営者が意図的に外した項目は尊重される）
 const PRE_DONE_IDS = [
   // 02_charts_clean — 21 files on disk
   'clean_usdjpy_5m','clean_usdjpy_15m','clean_usdjpy_1h','clean_usdjpy_4h','clean_usdjpy_1d','clean_usdjpy_1w',
@@ -474,12 +475,39 @@ const PRE_DONE_IDS = [
 ];
 let state = {};
 try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){}
-// 初回訪問時のみ、承認済み項目を自動チェック（ユーザーが後から外した場合は尊重する）
-if(!localStorage.getItem(PREFILL_KEY)){
-  PRE_DONE_IDS.forEach(id=>{ if(!(id in state)) state[id] = true; });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  localStorage.setItem(PREFILL_KEY, '1');
+// 1 回でもprefill済みのIDは記録しておく。以後ユーザーが外しても再チェックしない
+let prefilledApplied = [];
+try { prefilledApplied = JSON.parse(localStorage.getItem(PREFILL_APPLIED_KEY)) || []; } catch(e){}
+// 旧PREFILL_KEY('v2')で全IDをまとめて処理済みだった環境は、旧47IDを適用済みとして引き継ぐ
+const legacyFlag = localStorage.getItem('hado-shooting-checklist-prefilled-v2');
+if(legacyFlag && prefilledApplied.length === 0){
+  // 旧バージョン当時の47ID（clean/annot/ind前半）を適用済み扱い
+  prefilledApplied = [
+    'clean_usdjpy_5m','clean_usdjpy_15m','clean_usdjpy_1h','clean_usdjpy_4h','clean_usdjpy_1d','clean_usdjpy_1w',
+    'clean_xauusd_15m','clean_xauusd_1h','clean_xauusd_4h','clean_xauusd_1d',
+    'clean_btcusd_1h','clean_btcusd_4h','clean_btcusd_1d',
+    'clean_eurusd_1h','clean_eurusd_4h','clean_eurusd_1d',
+    'clean_gbpjpy_4h','clean_gbpjpy_1d','clean_us100_1h','clean_us100_1d','clean_spx500_1d',
+    'annot_usdjpy_4h_horizontal-lines','annot_usdjpy_4h_trendline-up','annot_usdjpy_4h_trendline-down',
+    'annot_usdjpy_4h_ma200','annot_usdjpy_4h_ma-multi','annot_usdjpy_4h_bollinger',
+    'annot_usdjpy_4h_rsi','annot_usdjpy_4h_macd','annot_usdjpy_4h_all-indicators',
+    'annot_usdjpy_1d_horizontal-lines','annot_usdjpy_1d_trendline-up','annot_usdjpy_1d_trendline-down',
+    'annot_usdjpy_1d_ma200','annot_usdjpy_1d_ma-multi','annot_usdjpy_1d_bollinger',
+    'annot_usdjpy_1d_rsi','annot_usdjpy_1d_macd','annot_usdjpy_1d_all-indicators',
+  ];
 }
+const prefilledSet = new Set(prefilledApplied);
+PRE_DONE_IDS.forEach(id=>{
+  if(!prefilledSet.has(id) && !(id in state)){
+    state[id] = true;
+    prefilledSet.add(id);
+  } else if(!prefilledSet.has(id)){
+    // state にすでに値がある場合も、二度と自動適用しないよう記録
+    prefilledSet.add(id);
+  }
+});
+localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+localStorage.setItem(PREFILL_APPLIED_KEY, JSON.stringify([...prefilledSet]));
 
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
