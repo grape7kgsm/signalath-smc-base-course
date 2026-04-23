@@ -93,8 +93,8 @@
 <main>
 <div id="manual" class="manual">
   <div class="manual-head">
-    <h2>📖 撮影マニュアル — サブIB向け</h2>
-    <p>このチェックリストで #73 以降の撮影作業を依頼します。撮影前に必ず一読してください。不明点があれば運営者まで。</p>
+    <h2>📖 撮影マニュアル — notaniさんへ</h2>
+    <p>notaniさん、よろしくお願いします！このチェックリストで #73 以降の撮影作業をお任せします。撮影前に必ず一読してください。不明点があれば運営者まで連絡ください。</p>
   </div>
   <div class="manual-body">
 
@@ -191,14 +191,56 @@
       <figure><img src="03_charts_annotated/annot_usdjpy_4h_macd.png" alt="MACD"><figcaption>MACD 下段表示<br>ヒストグラム＋シグナル線</figcaption></figure>
     </div>
 
-    <h3>📬 8. 困ったら</h3>
+    <h3>🤖 8. Claude Code を使う場合（オプション）</h3>
+    <p>notaniさんご自身の PC で Claude Code（Anthropic公式のコーディング補助AI）を使う場合、<strong>最初のセッションで以下のプロンプトをそのまま貼り付け</strong>てください。これでClaude Codeが今回の作業内容を把握し、スクショを貼るだけで判定してくれるようになります。</p>
+    <div class="warn">📋 <strong>コピペ用プロンプト（下の枠ごと選択してコピー）</strong></div>
+    <pre style="background:#0a0a0a;border:1px solid #333;border-radius:6px;padding:14px;overflow-x:auto;font-family:'Monaco',monospace;font-size:11px;color:#d0d0d0;line-height:1.6;white-space:pre-wrap">こんにちは。私はnotaniで、波動シグナル研究所というYouTubeチャンネル向けに
+TradingViewのスクショを撮影する作業を引き受けています。
+
+【プロジェクト概要】
+- チャンネル: 波動シグナル研究所（FX教育YouTube）
+- 運営: 別の担当者（以下「運営者」）
+- 私の役割: TradingViewチャートのスクショを撮影して、運営者に共有
+
+【参照すべき資料】
+チェックリストURL: https://signalath.com/youtube/tradingviewchecklist.html
+  → 「📖 撮影マニュアルを開く」ボタンを押すと完全マニュアルが見れる
+
+【作業範囲】
+チェックリストの #73 以降 を順番に撮影する
+
+【画像判定のお願い】
+私がスクショを貼り付けたら、以下の観点でチェックしてください：
+1. 銘柄が正しいか（USDJPY/XAUUSD/BTCUSD/ETHUSD など）
+2. 時間足が正しいか（5m/15m/1h/4h/1d/1w）
+3. インジケーターの設定（期間・色・位置）が checklist.html の指定通りか
+4. 凡例（左上のインジ名表示）に間違いが無いか
+5. 色ルール: 緑#26A69A（支持/陽線）、赤#EF5350（抵抗/陰線）、紫#9C27B0（MA200）
+6. ラインの太さは2px（デフォルト1pxは細すぎ）
+
+【応答スタイル】
+- FX初心者なので、技術用語は平易に噛み砕いて
+- OK/NG をまず最初に明示
+- NGなら何をどう直せばいいかを具体的に
+- よくあるミスも併せて教えてくれると助かる
+
+【禁止事項】
+- 海外FXブローカー名（Axon等）の露出
+- IBリンクの言及
+- 運営者の取引実績の言及
+
+準備OKなら「#73 ATR損切り幅の可視化 の手順を教えて」と聞くので、
+checklist.html の該当項目の howto を元に案内してください。</pre>
+    <div class="tip">💡 このプロンプトをClaude Codeのチャット欄に貼ってEnterすれば、前提共有完了です。あとは <kbd>⌘+⇧+S</kbd> → <kbd>⌘+V</kbd> でスクショを貼るだけ。</div>
+
+    <h3>📬 9. 困ったら</h3>
     <ul>
       <li>項目の <strong>howto</strong>（チェックリストで項目をクリックすると表示される詳細）を読み返す</li>
       <li>それでも不明なら Claude Code のチャットで「#XX の手順を教えて」と聞く → 待機しなくても画像だけ送れば判定してくれる</li>
       <li>有料機能に遭遇した場合は、撮影せず運営者へ連絡</li>
     </ul>
 
-    <h3>🗓️ 9. 運用ルール</h3>
+    <h3>🗓️ 10. 運用ルール</h3>
     <ul>
       <li>作業時間の目安: 1項目あたり 3〜5分（調子が出てきたら2分/項目）</li>
       <li>1セッションで 10項目 終わらせて休憩、が目安</li>
@@ -402,8 +444,42 @@ const items = [
 ];
 
 const STORAGE_KEY = 'hado-shooting-checklist-v1';
+const PREFILL_KEY = 'hado-shooting-checklist-prefilled-v2';
+// 2026-04-23 時点でローカルにファイルが存在する or チャットで承認済みの項目を初回訪問時に自動チェック
+const PRE_DONE_IDS = [
+  // 02_charts_clean — 21 files on disk
+  'clean_usdjpy_5m','clean_usdjpy_15m','clean_usdjpy_1h','clean_usdjpy_4h','clean_usdjpy_1d','clean_usdjpy_1w',
+  'clean_xauusd_15m','clean_xauusd_1h','clean_xauusd_4h','clean_xauusd_1d',
+  'clean_btcusd_1h','clean_btcusd_4h','clean_btcusd_1d',
+  'clean_eurusd_1h','clean_eurusd_4h','clean_eurusd_1d',
+  'clean_gbpjpy_4h','clean_gbpjpy_1d',
+  'clean_us100_1h','clean_us100_1d',
+  'clean_spx500_1d',
+  // 03_charts_annotated — 18 files on disk
+  'annot_usdjpy_4h_horizontal-lines','annot_usdjpy_4h_trendline-up','annot_usdjpy_4h_trendline-down',
+  'annot_usdjpy_4h_ma200','annot_usdjpy_4h_ma-multi','annot_usdjpy_4h_bollinger',
+  'annot_usdjpy_4h_rsi','annot_usdjpy_4h_macd','annot_usdjpy_4h_all-indicators',
+  'annot_usdjpy_1d_horizontal-lines','annot_usdjpy_1d_trendline-up','annot_usdjpy_1d_trendline-down',
+  'annot_usdjpy_1d_ma200','annot_usdjpy_1d_ma-multi','annot_usdjpy_1d_bollinger',
+  'annot_usdjpy_1d_rsi','annot_usdjpy_1d_macd','annot_usdjpy_1d_all-indicators',
+  // 04_indicators — 2026-04-23 チャットで運営者承認済み（#63-#70）
+  'ind_fibonacci_usdjpy_1d',         // #63
+  'ind_fibonacci_xauusd_1d',         // #64
+  'ind_ema-vs-sma_usdjpy_4h',        // #65
+  'ind_golden-cross_usdjpy_1d',      // #66
+  'ind_dead-cross_usdjpy_1d',        // #67
+  'ind_rsi-divergence_usdjpy_4h',    // #68
+  'ind_pivot-points_usdjpy_1h',      // #69
+  'ind_parabolic-sar_usdjpy_4h',     // #70
+];
 let state = {};
 try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){}
+// 初回訪問時のみ、承認済み項目を自動チェック（ユーザーが後から外した場合は尊重する）
+if(!localStorage.getItem(PREFILL_KEY)){
+  PRE_DONE_IDS.forEach(id=>{ if(!(id in state)) state[id] = true; });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(PREFILL_KEY, '1');
+}
 
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
