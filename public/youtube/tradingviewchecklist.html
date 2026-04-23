@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>📸 撮影チェックリスト - 波動シグナル研究所</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#0a0a0a;color:#e0e0e0;line-height:1.6;padding-bottom:100px}
+  header{position:sticky;top:0;z-index:100;background:#111;padding:14px 20px;border-bottom:2px solid #f4c75e;box-shadow:0 2px 10px rgba(0,0,0,0.5)}
+  h1{color:#f4c75e;font-size:18px;margin-bottom:10px}
+  .progress-bar{background:#222;height:26px;border-radius:13px;overflow:hidden;margin-bottom:10px;position:relative}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#26a69a,#f4c75e);transition:width .3s;width:0%}
+  .counter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;font-size:13px;color:#fff;text-shadow:0 0 4px rgba(0,0,0,0.9)}
+  .controls{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .controls button{background:#222;color:#e0e0e0;border:1px solid #333;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap}
+  .controls button:hover{background:#333}
+  .controls button.active{background:#f4c75e;color:#000;border-color:#f4c75e;font-weight:bold}
+  .controls input{background:#222;color:#e0e0e0;border:1px solid #333;padding:6px 12px;border-radius:6px;font-size:13px;flex:1;min-width:180px}
+  .reset{background:#4a1a1a !important;border-color:#6a2020 !important;color:#ff8080 !important}
+  main{max-width:960px;margin:0 auto;padding:16px}
+  .section-header{color:#f4c75e;font-size:14px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid #333;font-weight:bold}
+  .item{background:#151515;border-radius:8px;margin-bottom:3px;border:1px solid #222;overflow:hidden;transition:background .15s}
+  .item:hover{background:#1a1a1a}
+  .item.done{background:#0d1a0d;border-color:#1a4a2a;opacity:0.6}
+  .item-row{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;user-select:none}
+  .item-row input[type=checkbox]{width:20px;height:20px;cursor:pointer;flex-shrink:0;accent-color:#26a69a}
+  .item-num{display:inline-block;background:#2a2a2a;color:#f4c75e;font-family:'Monaco',monospace;font-size:11px;padding:2px 6px;border-radius:4px;min-width:38px;text-align:center;flex-shrink:0}
+  .item-name{flex:1;color:#fff;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item.done .item-name{text-decoration:line-through;color:#888}
+  .item-caret{color:#666;transition:transform .15s;flex-shrink:0;font-size:11px}
+  .item.open .item-caret{transform:rotate(90deg)}
+  .item-details{display:none;padding:8px 16px 12px 48px;border-top:1px solid #222;background:#0d0d0d}
+  .item.open .item-details{display:block}
+  .item-filename{font-family:'Monaco',monospace;font-size:11px;color:#999;margin-bottom:6px;word-break:break-all}
+  .item-howto{font-size:12px;color:#b0b0b0;line-height:1.7}
+  .item-howto ul{margin-left:18px}
+  .badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;background:#333;color:#ccc;margin-right:4px;vertical-align:middle}
+  .badge-b1{background:#1e3a8a}.badge-b2{background:#4a1e8a}.badge-b3{background:#8a4a1e}
+  .empty{text-align:center;padding:40px;color:#666}
+  .shortcuts{background:#0f0f0f;border:1px solid #2a2a2a;border-radius:8px;margin-top:10px;overflow:hidden}
+  .shortcuts-head{padding:8px 14px;cursor:pointer;user-select:none;font-size:12px;color:#f4c75e;display:flex;justify-content:space-between;align-items:center}
+  .shortcuts-head:hover{background:#1a1a1a}
+  .shortcuts-body{padding:12px 16px;border-top:1px solid #2a2a2a;display:none}
+  .shortcuts.open .shortcuts-body{display:block}
+  .shortcuts.open .shortcuts-caret{transform:rotate(90deg)}
+  .shortcuts-caret{display:inline-block;transition:transform .15s;color:#888}
+  .sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px 24px}
+  .sc-col h4{color:#26a69a;font-size:11px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+  .sc-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed #222}
+  .sc-row:last-child{border-bottom:none}
+  .sc-key{font-family:'Monaco',monospace;color:#f4c75e;background:#1a1a1a;padding:1px 6px;border-radius:3px;font-size:11px;white-space:nowrap;margin-left:8px}
+  .sc-label{color:#ccc;flex:1}
+  @media(max-width:600px){h1{font-size:15px}.item{padding:10px 12px}.controls button{padding:5px 10px;font-size:11px}}
+  /* ========== 説明書セクション (2026-04-23 追加) ========== */
+  .manual-bar{display:flex;gap:8px;margin-top:8px}
+  .manual-bar button{background:#2a1a4a;color:#d0b8ff;border:1px solid #5a3a8a;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold}
+  .manual-bar button:hover{background:#3a2a5a}
+  .manual-bar button.active{background:#5a3a8a;color:#fff}
+  .manual{background:#0f0f14;border:2px solid #5a3a8a;border-radius:10px;margin:16px 0 20px;padding:0;overflow:hidden;display:none}
+  .manual.open{display:block}
+  .manual-head{background:#1a0f2a;padding:14px 20px;border-bottom:1px solid #3a2a5a}
+  .manual-head h2{color:#d0b8ff;font-size:16px;margin-bottom:4px}
+  .manual-head p{color:#aaa;font-size:12px;margin:0}
+  .manual-body{padding:18px 24px}
+  .manual-body h3{color:#f4c75e;font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #333}
+  .manual-body h3:first-child{margin-top:0}
+  .manual-body h4{color:#26a69a;font-size:12px;margin:12px 0 6px}
+  .manual-body p,.manual-body li{color:#c0c0c0;font-size:12px;line-height:1.7}
+  .manual-body ul,.manual-body ol{margin-left:20px;margin-bottom:8px}
+  .manual-body code{background:#1a1a1a;color:#f4c75e;padding:1px 5px;border-radius:3px;font-family:'Monaco',monospace;font-size:11px}
+  .manual-body kbd{background:#2a2a2a;color:#f4c75e;padding:2px 7px;border-radius:4px;font-family:'Monaco',monospace;font-size:11px;border:1px solid #444;box-shadow:0 1px 0 #000;white-space:nowrap}
+  .manual-body table{border-collapse:collapse;margin:8px 0 12px;font-size:12px;width:100%}
+  .manual-body th,.manual-body td{border:1px solid #333;padding:6px 10px;text-align:left}
+  .manual-body th{background:#1a1a1a;color:#f4c75e}
+  .manual-body .color-swatch{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:6px;border:1px solid #333}
+  .manual-body .badge-free{background:#1a4a2a;color:#7fe0a8;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:bold}
+  .manual-body .badge-paid{background:#4a1a2a;color:#ffa8c0;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:bold}
+  .manual-body .warn{background:#2a1a0a;border-left:3px solid #ff9800;padding:8px 12px;margin:8px 0;color:#ffd8a0;font-size:12px;border-radius:4px}
+  .manual-body .tip{background:#0a1f1a;border-left:3px solid #26a69a;padding:8px 12px;margin:8px 0;color:#a8f0d0;font-size:12px;border-radius:4px}
+  .manual-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:10px 0 14px}
+  .manual-gallery figure{margin:0;background:#1a1a1a;padding:8px;border-radius:6px;border:1px solid #2a2a2a}
+  .manual-gallery img{width:100%;height:120px;object-fit:cover;border-radius:4px;display:block;background:#000}
+  .manual-gallery figcaption{color:#aaa;font-size:11px;margin-top:6px;text-align:center;line-height:1.4}
+</style>
+</head>
+<body>
+<header>
+  <h1>📸 波動シグナル研究所 撮影チェックリスト</h1>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div><span class="counter" id="counter">0 / 0</span></div>
+  <div class="manual-bar"><button id="manualToggle" onclick="toggleManual()">📖 撮影マニュアルを開く（はじめての方は必読）</button></div>
+</header>
+<main>
+<div id="manual" class="manual">
+  <div class="manual-head">
+    <h2>📖 撮影マニュアル — サブIB向け</h2>
+    <p>このチェックリストで #73 以降の撮影作業を依頼します。撮影前に必ず一読してください。不明点があれば運営者まで。</p>
+  </div>
+  <div class="manual-body">
+
+    <h3>🚀 1. 最速ワークフロー（Claude Code 直接貼り付け）</h3>
+    <p>TradingView の画面で撮りたいチャートを表示したら、以下の手順で進めます：</p>
+    <ol>
+      <li><kbd>⌘ Cmd</kbd> + <kbd>⇧ Shift</kbd> + <kbd>S</kbd> を押す → <strong>TradingView内蔵のスクショ機能が起動</strong>し、画像が<strong>クリップボードに自動コピー</strong>されます</li>
+      <li>Claude Code のチャット画面で <kbd>⌘ Cmd</kbd> + <kbd>V</kbd> → 画像がそのまま貼り付けられ、その場でフィードバックが来ます</li>
+      <li>OKが出たら次の項目に進む。必要なら<strong>後でまとめて</strong>ファイル保存（詳細は後述）</li>
+    </ol>
+    <div class="tip">💡 <strong>これが最速です。</strong> macOS標準の <kbd>⌘+⇧+4</kbd> も使えますが、Desktopにファイルが溜まり管理が面倒。TradingView内蔵の <kbd>⌘+⇧+S</kbd> ならクリップボード1発、確認1発、ファイル化は後でまとめて、が最も効率的。</div>
+
+    <h3>💾 2. ファイルの保存タイミング</h3>
+    <p>Claude Code でOKが出たショットは、以下のいずれかで保存：</p>
+    <ul>
+      <li><strong>方法A（推奨）</strong>: TradingView 画面右上のカメラアイコン → 「Save chart image」 → Downloadsフォルダに自動保存 → 適切なファイル名にリネーム</li>
+      <li><strong>方法B</strong>: <kbd>⌘+⇧+4</kbd> でmacOS画面キャプチャ → Desktopに保存 → リネーム</li>
+    </ul>
+    <p>保存先ファイル名は、チェックリストの各項目の下に表示される <code>04_indicators/ind_XXX.png</code> 形式に合わせてください。</p>
+    <div class="warn">⚠️ 承認されたスクショは <strong>必ず</strong> ファイル保存してください。Claude Codeへの貼り付けだけでは、動画編集時に素材が使えません。</div>
+
+    <h3>🎨 3. 色・太さルール（全員守る）</h3>
+    <p>ラインやインジケーターの色は、下記の統一ルールに従ってください。見た目がチャンネル全体で揃わないと動画の信頼感が下がります。</p>
+    <table>
+      <tr><th>色名</th><th>HEX</th><th>使うところ</th></tr>
+      <tr><td><span class="color-swatch" style="background:#26A69A"></span>緑</td><td><code>#26A69A</code></td><td>陽線／支持ライン／上昇トレンドライン</td></tr>
+      <tr><td><span class="color-swatch" style="background:#EF5350"></span>赤</td><td><code>#EF5350</code></td><td>陰線／抵抗ライン／下降トレンドライン</td></tr>
+      <tr><td><span class="color-swatch" style="background:#9C27B0"></span>紫</td><td><code>#9C27B0</code></td><td>MA200（長期トレンド線）</td></tr>
+      <tr><td><span class="color-swatch" style="background:#2196F3"></span>青</td><td><code>#2196F3</code></td><td>MA20／EMA（短期）</td></tr>
+      <tr><td><span class="color-swatch" style="background:#FF9800"></span>橙</td><td><code>#FF9800</code></td><td>MA50（中短期）</td></tr>
+      <tr><td><span class="color-swatch" style="background:#E91E63"></span>桃</td><td><code>#E91E63</code></td><td>MA100（中長期）</td></tr>
+    </table>
+    <ul>
+      <li><strong>線の太さは 2px</strong>（デフォルト1pxは細すぎて動画で見えない）</li>
+      <li>ラインツールの<strong>デフォルトはピンク</strong>になることが多い → 必ず上記色に変更</li>
+      <li>一度変更したら「<strong>スタイルを既定として保存</strong>」をONにすると、次回以降も自動適用される</li>
+    </ul>
+
+    <h3>🖼️ 4. 画面設定（固定）</h3>
+    <table>
+      <tr><th>項目</th><th>設定値</th></tr>
+      <tr><td>背景</td><td>黒（ダークテーマ）</td></tr>
+      <tr><td>タイムゾーン</td><td>UTC+9（日本時間）</td></tr>
+      <tr><td>ローソク陽線色</td><td><code>#26A69A</code></td></tr>
+      <tr><td>ローソク陰線色</td><td><code>#EF5350</code></td></tr>
+      <tr><td>グリッド</td><td>デフォルト（薄いグレー）</td></tr>
+      <tr><td>画面比率</td><td>16:9 を推奨（Remotion合成向け）</td></tr>
+      <tr><td>左上の凡例（インジ名）</td><td>表示ON（インジ設定値の確認用）</td></tr>
+    </table>
+
+    <h3>💳 5. 無料プラン vs 有料プラン</h3>
+    <p>TradingView には無料プランと有料プラン（Pro, Pro+, Premium）があります。以下が撮影に関係する違い：</p>
+    <table>
+      <tr><th>機能</th><th>無料</th><th>有料</th><th>撮影への影響</th></tr>
+      <tr><td>インジケーター同時追加</td><td>最大2つ</td><td>無制限</td><td><strong>MA×4（20/50/100/200）は有料必要</strong></td></tr>
+      <tr><td>2分割レイアウト</td><td>❌</td><td>✅</td><td><strong>平均足vs通常足 比較</strong>、<strong>2分割チャート</strong> は有料必要</td></tr>
+      <tr><td>4分割レイアウト</td><td>❌</td><td>✅</td><td><strong>マルチタイム4分割</strong> は有料必要</td></tr>
+      <tr><td>Bar Replay</td><td>日足のみ</td><td>全足</td><td>4H/1H以下の過去場面を探す時は有料必要</td></tr>
+      <tr><td>カスタム時間足</td><td>❌</td><td>✅</td><td>デフォルト時間足（5m/15m/1h/4h/1d/1w）は無料OK</td></tr>
+      <tr><td>チャートレイアウト保存数</td><td>1つ</td><td>複数</td><td>撮影中は1つで十分</td></tr>
+    </table>
+    <p>各チェックリスト項目には次のラベルを付けます：</p>
+    <ul>
+      <li><span class="badge-free">無料OK</span> — 無料プランで撮影可能</li>
+      <li><span class="badge-paid">要有料</span> — TradingView Pro以上のプランが必要</li>
+    </ul>
+    <div class="warn">⚠️ <strong>要有料</strong> 項目に遭遇したら、撮影せずに運営者へ連絡してください。こちらで代替撮影します。</div>
+
+    <h3>⚠️ 6. よくあるミス（本日の実例から）</h3>
+    <ol>
+      <li><strong>時間足を間違える</strong> — チェックリストに「4H」と書いてあるのに日足で撮ってしまう。撮影前に<strong>上部の時間足セレクタ</strong>を必ず確認。迷ったら x軸のラベル間隔で判定（1D なら1日1本、4H なら1日6本）</li>
+      <li><strong>インジの類似名誤選択</strong> — 「Moving Average」と「Multiple Moving Averages」は別物。凡例に「50, 100, 150, 200, ...」と複数期間が並んだら誤選択。単一期間の <code>SMA (50, close)</code> が正解</li>
+      <li><strong>Pivot Points Standard のデフォルト表示（R5/S5まで11本）</strong> — 設定→スタイルタブで R4/R5/S4/S5 をOFFにして R1-R3/S1-S3 の7本に絞る</li>
+      <li><strong>ラインのデフォルト色（ピンク）</strong> — 必ず上記の緑/赤/紫に変更し「既定として保存」</li>
+      <li><strong>縦ズーム不足</strong> — R1-R3やS1-S3が画面外。価格軸を上下ドラッグして縮小すると全体が見える</li>
+      <li><strong>チャート種類切替が見つからない</strong> — 「平均足」はインジケーター追加ではなく<strong>チャート種類切替</strong>（上部ツールバーのローソク足アイコン横のメニュー）</li>
+    </ol>
+
+    <h3>📎 7. お手本スクショ（既存素材）</h3>
+    <p>実際にOKが出ているサンプルを参考にしてください。</p>
+
+    <h4>クリーンチャート（2. 素のチャート）</h4>
+    <div class="manual-gallery">
+      <figure><img src="02_charts_clean/clean_usdjpy_4h.png" alt="USDJPY 4H clean"><figcaption>USDJPY 4H<br>インジ無し・黒背景のみ</figcaption></figure>
+      <figure><img src="02_charts_clean/clean_usdjpy_15m.png" alt="USDJPY 15m clean"><figcaption>USDJPY 15分<br>短時間足も同じシンプル構成</figcaption></figure>
+    </div>
+
+    <h4>加工済みチャート（3. 描画あり）</h4>
+    <div class="manual-gallery">
+      <figure><img src="03_charts_annotated/annot_usdjpy_1d_horizontal-lines.png" alt="horizontal lines"><figcaption>水平線（支持・抵抗）<br>緑=支持／赤=抵抗</figcaption></figure>
+      <figure><img src="03_charts_annotated/annot_usdjpy_1d_trendline-up.png" alt="trend line"><figcaption>上昇トレンドライン<br>安値→安値を結ぶ緑線</figcaption></figure>
+      <figure><img src="03_charts_annotated/annot_usdjpy_1d_ma200.png" alt="MA200"><figcaption>200MA単独<br>紫の太線がなだらかに</figcaption></figure>
+      <figure><img src="03_charts_annotated/annot_usdjpy_4h_rsi.png" alt="RSI"><figcaption>RSI 下段表示<br>サブウィンドウ</figcaption></figure>
+      <figure><img src="03_charts_annotated/annot_usdjpy_4h_macd.png" alt="MACD"><figcaption>MACD 下段表示<br>ヒストグラム＋シグナル線</figcaption></figure>
+    </div>
+
+    <h3>📬 8. 困ったら</h3>
+    <ul>
+      <li>項目の <strong>howto</strong>（チェックリストで項目をクリックすると表示される詳細）を読み返す</li>
+      <li>それでも不明なら Claude Code のチャットで「#XX の手順を教えて」と聞く → 待機しなくても画像だけ送れば判定してくれる</li>
+      <li>有料機能に遭遇した場合は、撮影せず運営者へ連絡</li>
+    </ul>
+
+    <h3>🗓️ 9. 運用ルール</h3>
+    <ul>
+      <li>作業時間の目安: 1項目あたり 3〜5分（調子が出てきたら2分/項目）</li>
+      <li>1セッションで 10項目 終わらせて休憩、が目安</li>
+      <li>不明点/失敗/代替案があったら即ログに残す（このチェックリストのメモ欄または別途連絡）</li>
+      <li>撮影完了したらチェックボックスにチェック → ブラウザに記録が保存される（同じPC/ブラウザで続きから再開可）</li>
+    </ul>
+
+  </div>
+</div>
+<div id="list"></div>
+</main>
+<script>
+// Helper: build clean chart items
+function clean(sym, tfs, disp){
+  return tfs.map(tf=>({
+    id:`clean_${sym}_${tf}`, batch:1, cat:'2. クリーンチャート',
+    name:`${disp} ${tf}足 素チャート`,
+    filename:`02_charts_clean/clean_${sym}_${tf}.png`,
+    howto:[`銘柄: ${disp}`,`時間足: ${tf}`,`線・インジすべて削除（背景は黒、ローソク足のみ）`,`Cmd+Opt+S で保存`]
+  }));
+}
+
+// Helper: build annotated chart items (9 variations × base)
+// 🎨 色ルール（全加工チャート共通）: 緑#26A69A=上昇/支持、赤#EF5350=下降/抵抗、紫#9C27B0=MA200
+// 線の色はデフォルトでピンクになる罠あり。毎回カラーピッカーで16進指定し、「スタイルを既定として保存」推奨
+const annotStates = [
+  {k:'horizontal-lines', n:'水平線（支持・抵抗帯）', h:['水平線ツール（Alt+H）','反発ゾーンに2〜4本','支持=緑#26A69A / 抵抗=赤#EF5350、太さ2px、実線']},
+  {k:'trendline-up', n:'上昇トレンドライン', h:['トレンドラインツール（Alt+T）','安値→安値を結ぶ斜線1本','色=緑#26A69A、太さ2px、実線','引き終わったら右側=未来方向に延長']},
+  {k:'trendline-down', n:'下降トレンドライン', h:['トレンドラインツール（Alt+T）','高値→高値を結ぶ斜線1本','色=赤#EF5350、太さ2px、実線','未来方向に延長','※ デフォルトはピンクのことが多い。必ず赤に変更＆「スタイルを既定として保存」']},
+  {k:'ma200', n:'200MA単独表示', h:['上部「インジケーター」→ Moving Average追加','ラベルをダブルクリック → 期間=200（初期値9になる場合あり、要変更）','ソース=close、色=紫#9C27B0、太さ2px','なだらかな線が価格の下を通る形になればOK']},
+  {k:'ma-multi', n:'MA 20/50/100/200 重ね', h:['既存のSMA(200)紫は残したまま、あと3本追加','【手順】「インジケーター」→ Moving Average を3回追加（毎回ラベルをダブルクリックして期間と色を変更）','① 期間20 / 青#2196F3（短期）','② 期間50 / 橙#FF9800（中短期）','③ 期間100 / 桃#E91E63（中長期）','④ 期間200 / 紫#9C27B0（既存・長期）','全て太さ2px、ソース=close']},
+  {k:'bollinger', n:'ボリンジャーバンド(20,2)', h:['インジ: Bollinger Bands','期間20、σ=2']},
+  {k:'rsi', n:'RSI 下段', h:['インジ: RSI（下段サブウィンドウ）']},
+  {k:'macd', n:'MACD 下段', h:['インジ: MACD（下段サブウィンドウ）']},
+  {k:'all-indicators', n:'全部のせ（ごちゃごちゃ対比用）', h:['MA×4 + BB + RSI + MACD + 出来高を全部重ねる','初心者の"やりすぎ"見本用']}
+];
+function annot(sym, tf, disp){
+  return annotStates.map(s=>({
+    id:`annot_${sym}_${tf}_${s.k}`, batch:1, cat:`3. 加工済みチャート (${disp} ${tf})`,
+    name:`${disp} ${tf} + ${s.n}`,
+    filename:`03_charts_annotated/annot_${sym}_${tf}_${s.k}.png`,
+    howto:[`銘柄: ${disp} / 時間足: ${tf}`, ...s.h, `Cmd+Opt+S`]
+  }));
+}
+
+const items = [
+  // ================ BATCH 1: TradingViewチャート系（Cmd+Opt+S） ================
+
+  // --- 2. クリーンチャート (22) ---
+  ...clean('usdjpy',['5m','15m','1h','4h','1d','1w'],'USDJPY'),
+  ...clean('xauusd',['15m','1h','4h','1d'],'XAUUSD'),
+  ...clean('btcusd',['1h','4h','1d','1w'],'BTCUSD'),
+  ...clean('eurusd',['1h','4h','1d'],'EURUSD'),
+  ...clean('gbpjpy',['4h','1d'],'GBPJPY'),
+  ...clean('us100',['1h','1d'],'US100'),
+  ...clean('spx500',['1d'],'SPX500'),
+
+  // --- 3. 加工済みチャート (27) ---
+  // XAUUSD 1d は USDJPY 1d と同じ9概念の重複のため削除（2026-04-23）
+  ...annot('usdjpy','4h','USDJPY'),
+  ...annot('usdjpy','1d','USDJPY'),
+  ...annot('xauusd','4h','XAUUSD'),
+
+  // --- 3. 加工済み 追加（動画001用: 出来高バー単独） ---
+  {id:'annot_usdjpy_4h_volume', batch:1, cat:'3. 加工済みチャート (USDJPY 4h)', name:'USDJPY 4h + 出来高バー（単独）', filename:'03_charts_annotated/annot_usdjpy_4h_volume.png', howto:['USDJPY 4H','MA系インジはすべて削除','インジ: Volume（下段サブウィンドウ）のみ追加','下部に緑赤ヒストグラムが見える構図','Cmd+Opt+S']},
+
+  // --- 4. マイナーインジケーター (22) ---
+  {id:'ind_vwap_usdjpy_5m', batch:1, cat:'4. マイナーインジ', name:'VWAP USDJPY 5分足', filename:'04_indicators/ind_vwap_usdjpy_5m.png', howto:['USDJPY 5分','インジ: VWAP（内蔵版・Volume Weighted Average Price）','⚠️ FXはボリューム取引量が正確でないため、スポットFXでVWAPは参考程度（株・先物が本来の用途）','Anchor Period は "Session"（デフォルト）で当日のVWAPを表示','VWAP線上を価格が何度か行き来している時間帯（揉み合い〜片方向ブレイク）を選ぶと教育素材として良い','画面は当日AM8:00〜現在の1日分程度に収める']},
+  {id:'ind_vwap_btcusd_15m', batch:1, cat:'4. マイナーインジ', name:'VWAP BTCUSD 15分足', filename:'04_indicators/ind_vwap_btcusd_15m.png', howto:['BTCUSD 15分','⚠️ USDJPYから銘柄変更 — 出来高が正確な銘柄でVWAPの本領を見せる','インジ: VWAP（内蔵版）','Anchor Period = "Session"（24時間市場なのでセッション切り替えに注意: UTC基準）','暗号資産は24/7なのでVWAPの基準がFXと違う点を対比素材に','画面は当日1日分を収める構図']},
+  {id:'ind_zigzag_usdjpy_4h', batch:1, cat:'4. マイナーインジ', name:'ZigZag USDJPY 4H', filename:'04_indicators/ind_zigzag_usdjpy_4h.png', howto:['USDJPY 4H','インジ: Zig Zag追加','⚠️ TVデフォ(5, 10)は株用で緩すぎ。FXではほぼ描画されない','左上ラベルをダブルクリック→Deviation を **0.3〜0.5** に下げる（USDJPY基準）','2〜3ヶ月で10〜20本の波が引ければOK']},
+  {id:'ind_zigzag_xauusd_1d', batch:1, cat:'4. マイナーインジ', name:'ZigZag XAUUSD 日足', filename:'04_indicators/ind_zigzag_xauusd_1d.png', howto:['XAUUSD 日足','Zig Zag追加（前で設定した Deviation=0.3 のままでOK）','💡 pivot(バー数)=10 が短期ノイズを弾くので、Deviationは小さくても綺麗になる','長期の波が10本程度引ければOK']},
+  {id:'ind_atr_usdjpy_4h', batch:1, cat:'4. マイナーインジ', name:'ATR USDJPY 4H', filename:'04_indicators/ind_atr_usdjpy_4h.png', howto:['USDJPY 4H','インジ: Average True Range（内蔵版・デフォルト期間14、下段サブパネル表示）','ボラティリティの変化が視覚的に分かる期間を選ぶ（高ボラ→低ボラ or その逆）','画面2〜3週間分程度。ATRが上昇/下降どちらも見える構図','凡例が "ATR (14)" のシンプルな1本線になってるか確認']},
+  {id:'ind_atr_xauusd_1h', batch:1, cat:'4. マイナーインジ', name:'ATR XAUUSD 1H', filename:'04_indicators/ind_atr_xauusd_1h.png', howto:['XAUUSD 1H','インジ: ATR（前項と同じ内蔵版・期間14）','ゴールドは高ボラ銘柄なのでATRの跳ね上がりが顕著な時期を選ぶ（指標発表前後、地政学イベント前後など）','前項のUSDJPY 4H ATRとの比較素材として使う → 値の桁が違う（USDJPYは0.1〜0.5、XAUUSDは数円〜数十円）']},
+  {id:'ind_rci_usdjpy_4h', batch:1, cat:'4. マイナーインジ', name:'RCI USDJPY 4H (3本)', filename:'04_indicators/ind_rci_usdjpy_4h.png', howto:['USDJPY 4H','⚠️ TV内蔵にはRCIがない場合あり。検索「Rank Correlation Index」または「RCI」でコミュニティ版を使用（LuxAlgo / zeal8x などの定番を選ぶ）','同じRCIインジを3回追加し、それぞれ期間を **9 / 26 / 52** に変更','色分け必須: 短期(9)=赤 / 中期(26)=黄 / 長期(52)=青','+80/-80ラインがあるか確認（天井圏/底値圏の判定用）','3本が同方向に揃った場面（「3本天井」「3本底」）が見える時間帯を選ぶ']},
+  {id:'ind_heikin-ashi_usdjpy_4h', batch:1, cat:'4. マイナーインジ', name:'平均足 USDJPY 4H', filename:'04_indicators/ind_heikin-ashi_usdjpy_4h.png', howto:['USDJPY 4H','上部バーのチャート種類切替（ローソク足アイコン横のメニュー）→ 「平均足」を選択','⚠️ これはインジケーター追加ではなく「チャート表示形式の切替」。インジケーター検索には出てこない','長い陽線連続 or 長い陰線連続が見える（トレンドが明瞭な）時期を選ぶ = 平均足の強み','画面は2週間程度の範囲']},
+  {id:'ind_heikin-ashi_comparison', batch:1, cat:'4. マイナーインジ', name:'平均足 vs 通常足 2画面比較', filename:'04_indicators/ind_heikin-ashi_comparison.png', howto:['画面上部ツールバーの「レイアウト選択」ボタン → 2分割（縦 or 横）','左チャート: 銘柄 USDJPY / 時間足 4H / チャート種類「ローソク足」','右チャート: 同じ USDJPY 4H / チャート種類「平均足」に変更','両チャートの表示期間（x軸ズーム）を合わせる → 同じ時期を比較','トレンドが明確な期間を選ぶ（両者の差が最も視覚的に出る）']},
+  {id:'ind_heikin-ashi_btcusd_4h', batch:1, cat:'4. マイナーインジ', name:'平均足 BTCUSD 4H', filename:'04_indicators/ind_heikin-ashi_btcusd_4h.png', howto:['BTCUSD 4H','チャート種類を「平均足」に切替','⚠️ USDJPYの姉妹版。暗号資産の強トレンドで平均足が真価を発揮','連続同色ローソクが10〜20本続くトレンド期間を選ぶ','ヒゲなしの長い陽線/陰線が連続＝トレンド継続シグナルとして解説できる']},
+  {id:'ind_ichimoku_usdjpy_4h', batch:1, cat:'4. マイナーインジ', name:'一目均衡表 USDJPY 4H', filename:'04_indicators/ind_ichimoku_usdjpy_4h.png', howto:['USDJPY 4H','インジ: Ichimoku Cloud（内蔵版・デフォルト設定 9, 26, 52, 26）','スタイルタブで全要素ON: 転換線(Conversion) / 基準線(Base) / 先行スパン1・2(Leading Span)/ 雲(Cloud)/ 遅行スパン(Lagging)','雲の色: 上昇雲=緑、下降雲=赤 のままでOK（デフォルト）','価格が雲の上/中/下 を切り替える場面（雲抜けブレイク）が見える期間を選ぶ','画面2〜3ヶ月分。雲の厚みと先行の様子が見える構図']},
+  {id:'ind_ichimoku_btcusd_1d', batch:1, cat:'4. マイナーインジ', name:'一目均衡表 BTCUSD 日足', filename:'04_indicators/ind_ichimoku_btcusd_1d.png', howto:['BTCUSD 日足','⚠️ USDJPY日足から銘柄変更 — 暗号資産は24/7市場で土日休場がないため雲の形成が異なる','インジ: Ichimoku Cloud（デフォルト設定）','前項のUSDJPY 4Hとの比較で「平日市場 vs 24/7市場の雲の違い」を対比素材に','画面は過去6ヶ月分程度。強トレンド後の雲の厚みが見える構図']},
+  {id:'ind_stochastic_usdjpy_4h', batch:1, cat:'4. マイナーインジ', name:'ストキャスティクス USDJPY 4H', filename:'04_indicators/ind_stochastic_usdjpy_4h.png', howto:['USDJPY 4H','インジ: Stochastic（内蔵版・デフォルト 14, 3, 3）','下段サブパネル表示。%K線(青)と%D線(オレンジ)の2本','+80/-20ラインが基準（買われすぎ/売られすぎ）','%Kと%Dがクロスする場面、特に80超えや20割れでのクロスが見える期間を選ぶ','画面2〜3週間分。複数のクロスが見える構図']},
+  {id:'ind_fibonacci_usdjpy_1d', batch:1, cat:'4. マイナーインジ', name:'フィボナッチ USDJPY 日足', filename:'04_indicators/ind_fibonacci_usdjpy_1d.png', howto:['USDJPY 日足','フィボナッチリトレースメントツール','直近の明確な安値→高値に引く']},
+  {id:'ind_fibonacci_xauusd_1d', batch:1, cat:'4. マイナーインジ', name:'フィボナッチ XAUUSD 日足', filename:'04_indicators/ind_fibonacci_xauusd_1d.png', howto:['XAUUSD 日足','フィボナッチ引く']},
+  {id:'ind_ema-vs-sma_usdjpy_4h', batch:1, cat:'4. マイナーインジ', name:'EMA vs SMA 比較 USDJPY 4H', filename:'04_indicators/ind_ema-vs-sma_usdjpy_4h.png', howto:['USDJPY 4H','インジ検索: 「Moving Average Exponential」(正式名) → EMA(50)追加','⚠️ 「Moving Average」だけだとデフォルトSMAが出る。必ず「Exponential」で絞る','別インジ: 「Moving Average」または「Moving Average Simple」 → SMA(50)追加','⚠️ 「Multiple Moving Averages」「SMAs」は多重MAで別物。凡例に「50, 100, 150,...」と出たら誤選択','色を分ける: EMA=青、SMA=赤 or ピンク（太さ2pxで見やすく）','凡例は2行のみが正解: `EMA (50, close)` と `SMA (50, close)` or `MA (50, close)`','トレンド発生時の乖離が見える期間を選ぶ（レンジだと2本が重なって差が見えない）']},
+  {id:'ind_golden-cross_usdjpy_1d', batch:1, cat:'4. マイナーインジ', name:'ゴールデンクロス USDJPY 日足', filename:'04_indicators/ind_golden-cross_usdjpy_1d.png', howto:['USDJPY 日足','SMA50 と SMA200 の2本追加（両方「Moving Average Simple」で単一線）','色: SMA50=青 / SMA200=紫 or 赤（太さ2px）','短期(50)が長期(200)を**下→上**に抜けた場面を探す（GC=強気転換サイン）','Bar Replay または左スクロールで過去へ遡る。USDJPY日足GCの候補時期: 2022年3月頃(利上げ開始)、2023年後半','画面: クロス地点が中央、クロス前後2ヶ月が両側に見える構図','仕上げ確認: クロス後に価格が伸びている → GCの効果が視覚的に示される']},
+  {id:'ind_dead-cross_usdjpy_1d', batch:1, cat:'4. マイナーインジ', name:'デッドクロス USDJPY 日足', filename:'04_indicators/ind_dead-cross_usdjpy_1d.png', howto:['USDJPY 日足','SMA50 と SMA200 の2本（前項ゴールデンクロスと同じ設定／色統一）','短期(50)が長期(200)を**上→下**に抜けた場面を探す（DC=弱気転換サイン）','候補時期: 2025年末〜2026年初頭の急落局面など（USDJPY日足）','画面: クロス地点が中央、クロス後も下落トレンドが続く様子が右側に見える構図','クロス後の戻り高値がSMA200で頭打ちになる場面も写ると最高（「SMA200がレジスタンスに転換」教科書例）']},
+  {id:'ind_rsi-divergence_usdjpy_4h', batch:1, cat:'4. マイナーインジ', name:'RSIダイバージェンス USDJPY 4H', filename:'04_indicators/ind_rsi-divergence_usdjpy_4h.png', howto:['USDJPY 4H','インジ: Relative Strength Index / RSI(14) 下段表示','トレンドラインは引かず素のチャートで撮る（Remotion側で後からマーカー/ラインを描く）','強気ダイバー推奨場面: 2026/1/26 17:00 JST (価格153.30/RSI14.0) → 2026/1/28 05:00 JST (価格152.09/RSI19.4) = 価格-1.2円↓/RSI+5.3pt↑','弱気ダイバー推奨場面: 2026/3/9 09:00 JST (価格158.86/RSI70.8) → 2026/3/14 05:00 JST (価格159.72/RSI68.5) = 価格+0.86円↑/RSI-2.3pt↓','強気弱気の両方撮ると動画内で対比できる','ファイル名: ind_rsi-divergence_usdjpy_4h.png（強気） / ind_rsi-divergence_usdjpy_4h_bearish.png（弱気）']},
+  {id:'ind_pivot-points_usdjpy_1h', batch:1, cat:'4. マイナーインジ', name:'ピボットポイント USDJPY 1H', filename:'04_indicators/ind_pivot-points_usdjpy_1h.png', howto:['USDJPY 1H','インジ: Pivot Points Standard（内蔵版・Traditional方式）','⚠️ デフォルトはR5/S5まで11本表示される。設定→スタイルタブで R4/R5/S4/S5 をOFF にして R1-R3/S1-S3 の7本に絞る','縦ズームは 4円幅程度（例: 158.0〜162.0）でローソクが明確に見える範囲','P と S1 or R1 への価格反応が見える時間帯を選ぶ']},
+  {id:'ind_parabolic-sar_usdjpy_4h', batch:1, cat:'4. マイナーインジ', name:'パラボリックSAR USDJPY 4H', filename:'04_indicators/ind_parabolic-sar_usdjpy_4h.png', howto:['USDJPY 4H','インジ: Parabolic SAR（内蔵版・デフォルト Start 0.02 / Increment 0.02 / Max 0.2）','凡例が `SAR (0.02, 0.02, 0.2)` と表示されれば正解','青い点(+)がローソクの上下に出る: 下=上昇トレンド、上=下降トレンド、点の反転=転換シグナル','画面3〜4ヶ月分。複数の転換点（トレンド→レンジ→トレンド）が見える構図','教育ポイント: レンジ相場で点が頻繁に切替る様子も写す=「SARはトレンドで強い、レンジで弱い」を解説できる']},
+  {id:'ind_atr-stoploss_example', batch:1, cat:'4. マイナーインジ', name:'ATR損切り幅の可視化', filename:'04_indicators/ind_atr-stoploss_example.png', howto:['USDJPY 4H','⚠️ 複合チャート: ATRインジ＋手動ラインの合成素材','手順1: ATR(14) を下段サブパネルに追加 → 現在のATR値を確認（例: 0.35）','手順2: 仮想エントリー点（直近の反発ローソク終値など）を選ぶ','手順3: エントリー価格 - (ATR × 1.5) の位置に水平線ツールで線を引く','手順4: 水平線にラベル「ストップ = エントリー - ATR×1.5」を付ける（ツール→テキスト）','エントリー矢印（↑ロング）も描くと教育的','画面はエントリー直後〜数日後の値動きまで入る構図（ストップに届かず利益になる or ストップに触れる結末）']},
+  {id:'ind_bb-squeeze_usdjpy_1h', batch:1, cat:'4. マイナーインジ', name:'BBスクイーズ USDJPY 1H', filename:'04_indicators/ind_bb-squeeze_usdjpy_1h.png', howto:['USDJPY 1H','インジ: Bollinger Bands（内蔵版・デフォルト 20期間 / 2σ）','上バンド・中バンド(SMA20)・下バンドの3本が表示される','スクイーズ（バンド幅が極端に狭い）→ エクスパンション（バンドが急拡大）の局面を探す','理想構図: スクイーズ区間（横ばい）→ ブレイク（片側バンドに張り付く上昇or下降）が1枚に収まる','画面2〜3日分程度。バンド幅の変化が視覚的に追える範囲','スクイーズ中のローソクがバンド内で揉み合ってる様子＋ブレイク後の一方向爆発が見えれば教科書例として最強']},
+  {id:'ind_bb-squeeze_ethusd_1h', batch:1, cat:'4. マイナーインジ', name:'BBスクイーズ ETHUSD 1H', filename:'04_indicators/ind_bb-squeeze_ethusd_1h.png', howto:['ETHUSD 1H','⚠️ USDJPY版の姉妹。高ボラ暗号資産でBBスクイーズの「爆発」が顕著','インジ: Bollinger Bands（同じデフォルト設定）','ETHは急騰急落が多くブレイク後の値幅が大きい = スクイーズからの動き出しが劇的','暗号資産は24/7なので週末のスクイーズ→月曜ブレイクのパターンもあり','画面2〜3日分で、USDJPY版との「ボラ幅の違い」が対比素材になる']},
+
+  // --- 6. SMC・チャートパターン (23) ---
+  {id:'smc_order-block_usdjpy_1h', batch:1, cat:'6-A. SMC/ICT', name:'オーダーブロック USDJPY 1H', filename:'06_smc_patterns/smc_order-block_usdjpy_1h.png', howto:['USDJPY 1H','大口が入って急反発した起点ブロックが明確な過去場面','マーキング無しの素チャートで撮る（注釈は後でRemotion）']},
+  {id:'smc_order-block_xauusd_15m', batch:1, cat:'6-A. SMC/ICT', name:'オーダーブロック XAUUSD 15M', filename:'06_smc_patterns/smc_order-block_xauusd_15m.png', howto:['XAUUSD 15M','OBが明確な過去場面']},
+  {id:'smc_fvg_usdjpy_1h', batch:1, cat:'6-A. SMC/ICT', name:'FVG（窓）USDJPY 1H', filename:'06_smc_patterns/smc_fvg_usdjpy_1h.png', howto:['USDJPY 1H','急激な3本足で窓（未充填ギャップ）が残っている場面']},
+  {id:'smc_fvg_xauusd_15m', batch:1, cat:'6-A. SMC/ICT', name:'FVG XAUUSD 15M', filename:'06_smc_patterns/smc_fvg_xauusd_15m.png', howto:['XAUUSD 15M','FVG場面']},
+  {id:'smc_choch_usdjpy_4h', batch:1, cat:'6-A. SMC/ICT', name:'CHoCH（構造転換）USDJPY 4H', filename:'06_smc_patterns/smc_choch_usdjpy_4h.png', howto:['USDJPY 4H','下降構造→上昇への明確な転換場面','直近高値を上抜けした直後']},
+  {id:'smc_bos_usdjpy_4h', batch:1, cat:'6-A. SMC/ICT', name:'BOS（構造ブレイク）USDJPY 4H', filename:'06_smc_patterns/smc_bos_usdjpy_4h.png', howto:['USDJPY 4H','トレンド継続方向に直近高値/安値をブレイクした瞬間']},
+  {id:'smc_liquidity-sweep_usdjpy_1h', batch:1, cat:'6-A. SMC/ICT', name:'リクイディティスイープ USDJPY 1H', filename:'06_smc_patterns/smc_liquidity-sweep_usdjpy_1h.png', howto:['USDJPY 1H','高値を瞬間的に更新→即反落（ストップ狩り）の典型場面']},
+  {id:'smc_killzone_usdjpy_5m', batch:1, cat:'6-A. SMC/ICT', name:'キルゾーン USDJPY 5M', filename:'06_smc_patterns/smc_killzone_usdjpy_5m.png', howto:['USDJPY 5M','ロンドン時間キルゾーン（16:00-19:00 JST）で大きく動いた日']},
+  {id:'pattern_double-top_usdjpy_4h', batch:1, cat:'6-B. チャートパターン', name:'ダブルトップ USDJPY 4H', filename:'06_smc_patterns/pattern_double-top_usdjpy_4h.png', howto:['USDJPY 4H','過去の綺麗なダブルトップ']},
+  {id:'pattern_double-bottom_eurusd_4h', batch:1, cat:'6-B. チャートパターン', name:'ダブルボトム EURUSD 4H', filename:'06_smc_patterns/pattern_double-bottom_eurusd_4h.png', howto:['EURUSD 4H','過去のダブルボトム']},
+  {id:'pattern_head-shoulders_usdjpy_1d', batch:1, cat:'6-B. チャートパターン', name:'三尊 USDJPY 日足', filename:'06_smc_patterns/pattern_head-shoulders_usdjpy_1d.png', howto:['USDJPY 日足','ヘッドアンドショルダー（3つの山）が綺麗な過去場面']},
+  {id:'pattern_inverse-head-shoulders', batch:1, cat:'6-B. チャートパターン', name:'逆三尊', filename:'06_smc_patterns/pattern_inverse-head-shoulders.png', howto:['任意銘柄・時間足','逆ヘッドアンドショルダー（3つの谷）']},
+  {id:'pattern_triangle-symmetric', batch:1, cat:'6-B. チャートパターン', name:'三角持ち合い', filename:'06_smc_patterns/pattern_triangle-symmetric.png', howto:['任意銘柄','高値切り下げ・安値切り上げの収束場面']},
+  {id:'pattern_breakout_usdjpy_1h', batch:1, cat:'6-B. チャートパターン', name:'ブレイクアウト USDJPY 1H', filename:'06_smc_patterns/pattern_breakout_usdjpy_1h.png', howto:['USDJPY 1H','レンジ上限/下限を明確にブレイクした瞬間']},
+  {id:'pattern_pullback-buy', batch:1, cat:'6-B. チャートパターン', name:'押し目買いの典型', filename:'06_smc_patterns/pattern_pullback-buy.png', howto:['上昇トレンド中に一度下落→再度上昇に転じた場面']},
+  {id:'pattern_pullback-sell', batch:1, cat:'6-B. チャートパターン', name:'戻り売りの典型', filename:'06_smc_patterns/pattern_pullback-sell.png', howto:['下降トレンド中に一度上昇→再度下落に転じた場面']},
+  {id:'pattern_harmonic_gartley', batch:1, cat:'6-B. チャートパターン', name:'ハーモニック（ガートレー）', filename:'06_smc_patterns/pattern_harmonic_gartley.png', howto:['任意銘柄','ガートレーパターンの対称構造が見える場面','XABCD点がある']},
+  {id:'theory_wyckoff_accumulation', batch:1, cat:'6-C. 理論系', name:'ワイコフ 蓄積レンジ', filename:'06_smc_patterns/theory_wyckoff_accumulation.png', howto:['下落後にレンジを形成→上昇ブレイクした過去場面','蓄積フェーズが見える']},
+  {id:'theory_dow_higher-highs', batch:1, cat:'6-C. 理論系', name:'ダウ理論: 高値・安値切り上げ', filename:'06_smc_patterns/theory_dow_higher-highs.png', howto:['明確な上昇トレンド（階段状に高値・安値が切り上がる）場面']},
+  {id:'theory_elliott_5wave', batch:1, cat:'6-C. 理論系', name:'エリオット波動 5波+3波', filename:'06_smc_patterns/theory_elliott_5wave.png', howto:['推進5波＋調整3波が見える過去場面','波カウントは後でRemotionで乗せる']},
+  {id:'pa_pinbar_examples', batch:1, cat:'6-D. プライスアクション', name:'ピンバー複数例', filename:'06_smc_patterns/pa_pinbar_examples.png', howto:['ピンバー（長いヒゲ）が複数出ている場面','反転シグナルとして綺麗な例']},
+  {id:'pa_engulfing_examples', batch:1, cat:'6-D. プライスアクション', name:'包み足（陽・陰）', filename:'06_smc_patterns/pa_engulfing_examples.png', howto:['陽線包み足・陰線包み足が明確な場面']},
+  {id:'pa_morning-evening-star', batch:1, cat:'6-D. プライスアクション', name:'明けの明星・宵の明星', filename:'06_smc_patterns/pa_morning-evening-star.png', howto:['3本のローソク足で構成される反転パターン']},
+
+  // --- 7. イベント・時事系 (6) ---
+  {id:'event_fomc_usdjpy_reaction', batch:1, cat:'7. イベント', name:'FOMC時 USDJPY急変動', filename:'07_events/event_fomc_usdjpy_reaction.png', howto:['USDJPY 15分〜1H','Bar Replayで過去のFOMC日（3/19、5/6など）を選択','発表時刻(3:00 AM JST)までシーク→急変動瞬間を撮影']},
+  {id:'event_fomc_xauusd_reaction', batch:1, cat:'7. イベント', name:'FOMC時 XAUUSD急変動', filename:'07_events/event_fomc_xauusd_reaction.png', howto:['XAUUSD 15分〜1H','同じFOMC日のゴールド反応']},
+  {id:'event_nfp_usdjpy_spike', batch:1, cat:'7. イベント', name:'雇用統計 USDJPYスパイク', filename:'07_events/event_nfp_usdjpy_spike.png', howto:['USDJPY 5分〜15分','Bar Replayで過去の第1金曜日（21:30 JST）を選択','発表直後の瞬間スパイク']},
+  {id:'event_nfp_xauusd_spike', batch:1, cat:'7. イベント', name:'雇用統計 XAUUSDスパイク', filename:'07_events/event_nfp_xauusd_spike.png', howto:['XAUUSD 5分〜15分','同じNFP日のゴールド反応']},
+  {id:'event_monthly-anomaly_usdjpy', batch:1, cat:'7. イベント', name:'USDJPY月足アノマリー', filename:'07_events/event_monthly-anomaly_usdjpy.png', howto:['USDJPY 月足','過去10年以上の長期チャート','月別の動きが見える']},
+  {id:'event_session-london-breakout', batch:1, cat:'7. イベント', name:'ロンドン時間ブレイクアウト', filename:'07_events/event_session-london-breakout.png', howto:['USDJPY 15分','ロンドン時間（16:00 JST〜）に大きくブレイクした日']},
+
+  // ================ BATCH 2: ブラウザUI系（Cmd+Shift+4+Space） ================
+
+  // --- 1. UI操作系 (37) ---
+  {id:'ui_register-page', batch:2, cat:'1-A. 登録・プラン', name:'登録画面', filename:'01_ui/ui_register-page.png', howto:['ログアウト状態で https://www.tradingview.com/signup/ を開く','メール入力・SNSログインボタンが並ぶ画面','Cmd+Shift+4+Space でウィンドウ撮影']},
+  {id:'ui_login-page', batch:2, cat:'1-A. 登録・プラン', name:'ログイン画面', filename:'01_ui/ui_login-page.png', howto:['https://www.tradingview.com/signin/','ログインダイアログ画面']},
+  {id:'ui_plan-comparison', batch:2, cat:'1-A. 登録・プラン', name:'5プラン比較ページ', filename:'01_ui/ui_plan-comparison.png', howto:['https://www.tradingview.com/pricing/','Free/Essential/Plus/Premium/Ultimate の比較表']},
+  {id:'ui_homepage_chart-button', batch:2, cat:'1-B. 基本画面', name:'公式TOPの「チャート」ボタン（動画001用）', filename:'01_ui/ui_homepage_chart-button.png', howto:['ログイン状態で https://www.tradingview.com/ トップを開く','画面右上の「チャート」ボタンがはっきり見える構図','ブラウザのタブバーは切る','slide_018 で使用']},
+  {id:'ui_empty-chart-initial', batch:2, cat:'1-B. 基本画面', name:'初回チャート画面', filename:'01_ui/ui_empty-chart-initial.png', howto:['ログイン直後の初期チャート画面（デフォルト状態）']},
+  {id:'ui_three-areas-overview', batch:2, cat:'1-B. 基本画面', name:'3エリア全体ビュー', filename:'01_ui/ui_three-areas-overview.png', howto:['通常のチャート画面','中央チャート・左ツールバー・上部バーが全部見える構図']},
+  {id:'ui_toolbar-left-full', batch:2, cat:'1-B. 基本画面', name:'左端ツールバー全体', filename:'01_ui/ui_toolbar-left-full.png', howto:['左端の描画ツールバーが展開状態','全アイコンが見える']},
+  {id:'ui_symbol-search_closed', batch:2, cat:'1-C. 銘柄検索・時間足', name:'銘柄検索ボックス（閉）', filename:'01_ui/ui_symbol-search_closed.png', howto:['左上の検索ボックス閉じた通常状態']},
+  {id:'ui_symbol-search_open-empty', batch:2, cat:'1-C. 銘柄検索・時間足', name:'銘柄検索（開・空）', filename:'01_ui/ui_symbol-search_open-empty.png', howto:['検索ボックスをクリックして開いた直後','入力なし']},
+  {id:'ui_symbol-search_usdjpy', batch:2, cat:'1-C. 銘柄検索・時間足', name:'銘柄検索（USDJPY入力中）', filename:'01_ui/ui_symbol-search_usdjpy.png', howto:['"USDJPY" と入力','候補リスト表示中']},
+  {id:'ui_symbol-search_xauusd', batch:2, cat:'1-C. 銘柄検索・時間足', name:'銘柄検索（XAUUSD入力中）', filename:'01_ui/ui_symbol-search_xauusd.png', howto:['"XAUUSD" と入力']},
+  {id:'ui_symbol-search_btcusd', batch:2, cat:'1-C. 銘柄検索・時間足', name:'銘柄検索（BTCUSD入力中）', filename:'01_ui/ui_symbol-search_btcusd.png', howto:['"BTCUSD" と入力']},
+  {id:'ui_timeframe-menu', batch:2, cat:'1-C. 銘柄検索・時間足', name:'時間足プルダウン展開', filename:'01_ui/ui_timeframe-menu.png', howto:['上部バーの時間足をクリック→プルダウン展開状態']},
+  {id:'ui_tool_horizontal-line', batch:2, cat:'1-D. 描画ツール', name:'水平線ツール選択', filename:'01_ui/ui_tool_horizontal-line.png', howto:['左端ツールバーの水平線ツールをホバー/選択']},
+  {id:'ui_tool_horizontal-dragging', batch:2, cat:'1-D. 描画ツール', name:'水平線を引く瞬間', filename:'01_ui/ui_tool_horizontal-dragging.png', howto:['チャート上で水平線を引いているドラッグ中の瞬間']},
+  {id:'ui_tool_trend-line', batch:2, cat:'1-D. 描画ツール', name:'トレンドラインツール選択', filename:'01_ui/ui_tool_trend-line.png', howto:['トレンドラインツールを選択状態']},
+  {id:'ui_tool_parallel-channel', batch:2, cat:'1-D. 描画ツール', name:'平行チャンネルツール', filename:'01_ui/ui_tool_parallel-channel.png', howto:['平行チャンネルツールを選択']},
+  {id:'ui_tool_fibonacci', batch:2, cat:'1-D. 描画ツール', name:'フィボナッチツール', filename:'01_ui/ui_tool_fibonacci.png', howto:['フィボナッチリトレースメントツールを選択']},
+  {id:'ui_indicator-search_empty', batch:2, cat:'1-E. インジケーター', name:'インジ検索（空）', filename:'01_ui/ui_indicator-search_empty.png', howto:['上部の「インジケーター」ボタンをクリック','検索ダイアログ（空）']},
+  {id:'ui_indicator-search_ma', batch:2, cat:'1-E. インジケーター', name:'インジ検索（Moving Average）', filename:'01_ui/ui_indicator-search_ma.png', howto:['"Moving Average" と入力','候補リスト表示']},
+  {id:'ui_indicator-search_volume', batch:2, cat:'1-E. インジケーター', name:'インジ検索（Volume）', filename:'01_ui/ui_indicator-search_volume.png', howto:['"Volume" と入力']},
+  {id:'ui_indicator-ma-params', batch:2, cat:'1-E. インジケーター', name:'MAパラメータ編集ダイアログ', filename:'01_ui/ui_indicator-ma-params.png', howto:['MA追加後、インジ名クリック→設定','長さ=200 を入力中の画面']},
+  {id:'ui_indicator-volume-added', batch:2, cat:'1-E. インジケーター', name:'出来高追加直後', filename:'01_ui/ui_indicator-volume-added.png', howto:['Volumeインジ追加後','下段サブウィンドウに棒グラフが出た状態']},
+  {id:'ui_alert_right-click-menu', batch:2, cat:'1-F. アラート', name:'右クリックメニュー', filename:'01_ui/ui_alert_right-click-menu.png', howto:['水平線の上で右クリック','メニュー展開状態']},
+  {id:'ui_alert_dialog_condition', batch:2, cat:'1-F. アラート', name:'アラート作成（条件タブ）', filename:'01_ui/ui_alert_dialog_condition.png', howto:['アラート作成ダイアログを開く','条件タブ表示']},
+  {id:'ui_alert_dialog_notification', batch:2, cat:'1-F. アラート', name:'アラート作成（通知タブ）', filename:'01_ui/ui_alert_dialog_notification.png', howto:['通知タブに切替']},
+  {id:'ui_alert_dialog_webhook', batch:2, cat:'1-F. アラート', name:'アラート Webhook URL欄', filename:'01_ui/ui_alert_dialog_webhook.png', howto:['通知タブで Webhook URL 欄が見える状態','Pro+以上プラン必要']},
+  {id:'ui_alert_notification-popup', batch:2, cat:'1-F. アラート', name:'アラート発動ポップアップ', filename:'01_ui/ui_alert_notification-popup.png', howto:['実際にアラートが発動した瞬間のポップアップ','もしくはデモ表示']},
+  {id:'ui_alert_manager-panel', batch:2, cat:'1-F. アラート', name:'アラート管理パネル', filename:'01_ui/ui_alert_manager-panel.png', howto:['右サイドのアラートアイコン→一覧パネル表示']},
+  {id:'ui_layout-save-dialog', batch:2, cat:'1-G. 保存・設定', name:'レイアウト保存ダイアログ', filename:'01_ui/ui_layout-save-dialog.png', howto:['右上のレイアウト名をクリック→新規保存','名前入力ダイアログ']},
+  {id:'ui_settings_appearance', batch:2, cat:'1-G. 保存・設定', name:'チャート設定（外観）', filename:'01_ui/ui_settings_appearance.png', howto:['チャート右クリック→設定','外観タブ表示']},
+  {id:'ui_watchlist', batch:2, cat:'1-G. 保存・設定', name:'ウォッチリスト', filename:'01_ui/ui_watchlist.png', howto:['右サイドのウォッチリスト展開状態']},
+  {id:'ui_pine_editor_empty', batch:2, cat:'1-H. Pine・ストラテジー', name:'Pine Editor（空）', filename:'01_ui/ui_pine_editor_empty.png', howto:['画面下部のPine Editorタブを開く','空の状態']},
+  {id:'ui_pine_editor_sample-indicator', batch:2, cat:'1-H. Pine・ストラテジー', name:'Pine Editor（サンプルInd）', filename:'01_ui/ui_pine_editor_sample-indicator.png', howto:['Pine Editor → 「開く」→ 組み込みインジのコード','または New→Indicatorでテンプレ表示']},
+  {id:'ui_pine_editor_sample-strategy', batch:2, cat:'1-H. Pine・ストラテジー', name:'Pine Editor（サンプルStrategy）', filename:'01_ui/ui_pine_editor_sample-strategy.png', howto:['New→Strategy でテンプレ戦略コード表示']},
+  {id:'ui_strategy-tester_result', batch:2, cat:'1-H. Pine・ストラテジー', name:'ストラテジーテスター結果', filename:'01_ui/ui_strategy-tester_result.png', howto:['ストラテジーを適用して結果タブ表示','資産曲線・統計が見える']},
+  {id:'ui_mobile_chart', batch:2, cat:'1-I. モバイル', name:'TVモバイルアプリ チャート', filename:'01_ui/ui_mobile_chart.png', howto:['iOS/AndroidのTradingViewアプリ','チャート画面をスクリーンショット','AirDropでMacへ']},
+  {id:'ui_mobile_alert-notification', batch:2, cat:'1-I. モバイル', name:'スマホの通知バー', filename:'01_ui/ui_mobile_alert-notification.png', howto:['スマホにTVアラート通知が来た瞬間','通知センター表示']},
+
+  // --- 5. TV機能系 (14) ---
+  {id:'feat_currency-strength', batch:2, cat:'5. TV機能系', name:'通貨強弱（Forex Cross Rates）', filename:'05_features/feat_currency-strength.png', howto:['https://www.tradingview.com/markets/currencies/rates-major/','Cross Rates表']},
+  {id:'feat_correlation-matrix', batch:2, cat:'5. TV機能系', name:'通貨相関マトリクス', filename:'05_features/feat_correlation-matrix.png', howto:['通貨相関のヒートマップページ','または自作インジで相関表示']},
+  {id:'feat_multi-chart_2panels', batch:2, cat:'5. TV機能系', name:'2分割チャート', filename:'05_features/feat_multi-chart_2panels.png', howto:['上部メニューからレイアウト→2分割','同銘柄で時間足2つ並べる']},
+  {id:'feat_multi-chart_4panels', batch:2, cat:'5. TV機能系', name:'4分割チャート', filename:'05_features/feat_multi-chart_4panels.png', howto:['レイアウト→4分割','マルチタイム構図（5m/15m/1h/4h）']},
+  {id:'feat_session-breaks_usdjpy', batch:2, cat:'5. TV機能系', name:'セッション色分け', filename:'05_features/feat_session-breaks_usdjpy.png', howto:['USDJPY 1H','インジ: "Session Breaks" 追加','ロンドン/NY/東京セッションに縦線']},
+  {id:'feat_bar-replay_usdjpy', batch:2, cat:'5. TV機能系', name:'Bar Replayモード', filename:'05_features/feat_bar-replay_usdjpy.png', howto:['USDJPY チャート','上部のリプレイボタン開始','再生中の画面']},
+  {id:'feat_long-position-tool', batch:2, cat:'5. TV機能系', name:'ロングポジションツール', filename:'05_features/feat_long-position-tool.png', howto:['描画ツール→ロングポジション','R:R比率が見える構図']},
+  {id:'feat_short-position-tool', batch:2, cat:'5. TV機能系', name:'ショートポジションツール', filename:'05_features/feat_short-position-tool.png', howto:['描画ツール→ショートポジション']},
+  {id:'feat_position-lines_chart', batch:2, cat:'5. TV機能系', name:'ポジションライン付きチャート', filename:'05_features/feat_position-lines_chart.png', howto:['エントリー/SL/TP の水平線を引いたチャート','色分け（エントリー=白、SL=赤、TP=緑）']},
+  {id:'feat_economic-calendar', batch:2, cat:'5. TV機能系', name:'経済カレンダー', filename:'05_features/feat_economic-calendar.png', howto:['https://www.tradingview.com/economic-calendar/','重要度フィルター適用']},
+  {id:'feat_news-feed', batch:2, cat:'5. TV機能系', name:'ニュースフィード', filename:'05_features/feat_news-feed.png', howto:['右サイドのニュースフィードパネル']},
+  {id:'feat_heatmap-forex', batch:2, cat:'5. TV機能系', name:'FXヒートマップ', filename:'05_features/feat_heatmap-forex.png', howto:['https://www.tradingview.com/heatmap/forex/']},
+  {id:'feat_ideas-page', batch:2, cat:'5. TV機能系', name:'アイデア投稿ページ', filename:'05_features/feat_ideas-page.png', howto:['https://www.tradingview.com/ideas/','アイデアフィード表示']},
+  {id:'feat_stock-screener', batch:2, cat:'5. TV機能系', name:'ストックスクリーナー', filename:'05_features/feat_stock-screener.png', howto:['https://www.tradingview.com/screener/']},
+
+  // ================ BATCH 3: MT5系（Cmd+Shift+4+Space） ================
+  {id:'mt5_chart_usdjpy_4h', batch:3, cat:'8-A. MT5デスクトップ', name:'MT5 USDJPY 4H', filename:'08_mt5/mt5_chart_usdjpy_4h.png', howto:['MT5アプリでUSDJPY 4H表示','Cmd+Shift+4+Space でウィンドウ撮影']},
+  {id:'mt5_chart_xauusd_1d', batch:3, cat:'8-A. MT5デスクトップ', name:'MT5 XAUUSD 日足', filename:'08_mt5/mt5_chart_xauusd_1d.png', howto:['MT5でXAUUSD日足表示']},
+  {id:'mt5_market-watch', batch:3, cat:'8-A. MT5デスクトップ', name:'気配値ウィンドウ', filename:'08_mt5/mt5_market-watch.png', howto:['気配値ウィンドウを前面に','複数通貨ペアのBid/Ask一覧']},
+  {id:'mt5_navigator', batch:3, cat:'8-A. MT5デスクトップ', name:'ナビゲーター', filename:'08_mt5/mt5_navigator.png', howto:['ナビゲーターウィンドウ表示','口座・インジ・EA・スクリプトのツリー']},
+  {id:'mt5_terminal_trade', batch:3, cat:'8-A. MT5デスクトップ', name:'ターミナル（取引）', filename:'08_mt5/mt5_terminal_trade.png', howto:['ターミナル→取引タブ','ポジション一覧']},
+  {id:'mt5_terminal_history', batch:3, cat:'8-A. MT5デスクトップ', name:'ターミナル（履歴）', filename:'08_mt5/mt5_terminal_history.png', howto:['ターミナル→履歴タブ','取引履歴一覧']},
+  {id:'mt5_new-order-dialog', batch:3, cat:'8-A. MT5デスクトップ', name:'新規注文ダイアログ', filename:'08_mt5/mt5_new-order-dialog.png', howto:['F9キーで新規注文ダイアログ','成行/指値/逆指値切替可能']},
+  {id:'mt5_ea-attached', batch:3, cat:'8-A. MT5デスクトップ', name:'EA適用チャート', filename:'08_mt5/mt5_ea-attached.png', howto:['任意のEAをチャートにドラッグ','右上にEA名とスマイルマーク']},
+  {id:'mt5_strategy-tester_setup', batch:3, cat:'8-A. MT5デスクトップ', name:'ストラテジーテスター設定', filename:'08_mt5/mt5_strategy-tester_setup.png', howto:['Ctrl+R でストラテジーテスター','EAと期間設定の画面']},
+  {id:'mt5_strategy-tester_result', batch:3, cat:'8-A. MT5デスクトップ', name:'バックテスト結果', filename:'08_mt5/mt5_strategy-tester_result.png', howto:['バックテスト完了後の結果グラフ','資産曲線が見える']},
+  {id:'mt5_indicators-list', batch:3, cat:'8-A. MT5デスクトップ', name:'インジケーター一覧', filename:'08_mt5/mt5_indicators-list.png', howto:['挿入メニュー→インジケーター','標準インジのサブメニュー展開']},
+  {id:'mt5_mobile_chart', batch:3, cat:'8-B. MT5モバイル', name:'MT5スマホ チャート', filename:'08_mt5/mt5_mobile_chart.png', howto:['スマホのMT5アプリ','チャート画面をスクショ→AirDrop']},
+  {id:'mt5_mobile_new-order', batch:3, cat:'8-B. MT5モバイル', name:'MT5スマホ 注文画面', filename:'08_mt5/mt5_mobile_new-order.png', howto:['スマホのMT5で新規注文画面']},
+  {id:'mt5_mobile_positions', batch:3, cat:'8-B. MT5モバイル', name:'MT5スマホ ポジション一覧', filename:'08_mt5/mt5_mobile_positions.png', howto:['スマホのMT5でポジション一覧']},
+  {id:'mt4_chart_usdjpy_4h', batch:3, cat:'8-C. MT4比較', name:'MT4 USDJPY 4H（比較用）', filename:'08_mt5/mt4_chart_usdjpy_4h.png', howto:['MT4アプリでUSDJPY 4H表示']},
+  {id:'mt4-vs-mt5_side-by-side', batch:3, cat:'8-C. MT4比較', name:'MT4 vs MT5 並列', filename:'08_mt5/mt4-vs-mt5_side-by-side.png', howto:['MT4とMT5を左右に並べる','同じ銘柄・時間足で比較']},
+];
+
+const STORAGE_KEY = 'hado-shooting-checklist-v1';
+let state = {};
+try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){}
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function render(){
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  items.forEach((it,i)=>{ it._n = i+1; });
+  const bySection = {};
+  items.forEach(it=>{
+    if(!bySection[it.cat]) bySection[it.cat]=[];
+    bySection[it.cat].push(it);
+  });
+  Object.entries(bySection).forEach(([cat,arr])=>{
+    const sh = document.createElement('div');
+    sh.className='section-header';
+    sh.textContent = `${cat} (${arr.length}件)`;
+    list.appendChild(sh);
+    arr.forEach(it=>{
+      const done = !!state[it.id];
+      const d = document.createElement('div');
+      d.className = 'item'+(done?' done':'');
+      d.innerHTML = `<div class="item-row"><input type="checkbox" ${done?'checked':''} data-id="${it.id}"><span class="item-num">#${it._n}</span><span class="item-name">${esc(it.name)}</span><span class="item-caret">▶</span></div><div class="item-details"><div class="item-filename">${esc(it.filename)}</div><div class="item-howto"><ul>${(it.howto||[]).map(h=>`<li>${esc(h)}</li>`).join('')}</ul></div></div>`;
+      list.appendChild(d);
+    });
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const total = items.length;
+  const done = items.filter(it=>state[it.id]).length;
+  document.getElementById('counter').textContent = `${done} / ${total} (${Math.round(done/total*100)}%)`;
+  document.getElementById('progressFill').style.width = `${done/total*100}%`;
+}
+
+document.addEventListener('change',e=>{
+  if(e.target.matches('input[type=checkbox][data-id]')){
+    const id = e.target.dataset.id;
+    if(e.target.checked) state[id]=true;
+    else delete state[id];
+    save();
+    render();
+  }
+});
+
+// item-row クリックで詳細を折り畳み開閉（チェックボックス自体のクリックは除外）
+document.addEventListener('click',e=>{
+  const row = e.target.closest('.item-row');
+  if(row && !e.target.matches('input[type=checkbox]')){
+    row.closest('.item').classList.toggle('open');
+  }
+});
+
+function toggleManual(){
+  const m = document.getElementById('manual');
+  const btn = document.getElementById('manualToggle');
+  m.classList.toggle('open');
+  if(m.classList.contains('open')){
+    btn.textContent = '📖 撮影マニュアルを閉じる';
+    btn.classList.add('active');
+  } else {
+    btn.textContent = '📖 撮影マニュアルを開く（はじめての方は必読）';
+    btn.classList.remove('active');
+  }
+}
+
+render();
+</script>
+</body>
+</html>
