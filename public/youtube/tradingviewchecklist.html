@@ -28,6 +28,12 @@
   .item-num{display:inline-block;background:#2a2a2a;color:#f4c75e;font-family:'Monaco',monospace;font-size:11px;padding:2px 6px;border-radius:4px;min-width:38px;text-align:center;flex-shrink:0}
   .item-name{flex:1;color:#fff;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .item.done .item-name{text-decoration:line-through;color:#888}
+  .item-diff{display:inline-block;font-size:11px;font-family:'Monaco',monospace;padding:2px 6px;border-radius:4px;background:#1a1a1a;flex-shrink:0;letter-spacing:1px;line-height:1}
+  .item-diff.d1{color:#7fe0a8;border:1px solid #1a4a2a}
+  .item-diff.d2{color:#f4c75e;border:1px solid #5a4a1e}
+  .item-diff.d3{color:#ff9a7f;border:1px solid #5a2a1e}
+  .diff-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;color:#888;margin-top:6px}
+  .diff-legend .item-diff{font-size:10px}
   .item-caret{color:#666;transition:transform .15s;flex-shrink:0;font-size:11px}
   .item.open .item-caret{transform:rotate(90deg)}
   .item-details{display:none;padding:8px 16px 12px 48px;border-top:1px solid #222;background:#0d0d0d}
@@ -88,6 +94,7 @@
 <header>
   <h1>📸 波動シグナル研究所 撮影チェックリスト</h1>
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div><span class="counter" id="counter">0 / 0</span></div>
+  <div class="diff-legend">難易度:<span class="item-diff d1">⭐☆☆</span>簡単（URLを開いてスクショ）<span class="item-diff d2">⭐⭐☆</span>ふつう（設定・色変更あり）<span class="item-diff d3">⭐⭐⭐</span>むずい（過去場面探し・複合設定）</div>
   <div class="manual-bar"><button id="manualToggle" onclick="toggleManual()">📖 撮影マニュアルを開く（はじめての方は必読）</button></div>
 </header>
 <main>
@@ -233,14 +240,24 @@ TradingViewのスクショを撮影する作業を引き受けています。
 checklist.html の該当項目の howto を元に案内してください。</pre>
     <div class="tip">💡 このプロンプトをClaude Codeのチャット欄に貼ってEnterすれば、前提共有完了です。あとは <kbd>⌘+⇧+S</kbd> → <kbd>⌘+V</kbd> でスクショを貼るだけ。</div>
 
-    <h3>📬 9. 困ったら</h3>
+    <h3>⭐ 9. 難易度ラベルの見方</h3>
+    <p>各項目の項目名の前に、3段階の難易度が表示されています。作業計画の参考にしてください：</p>
+    <table>
+      <tr><th>表示</th><th>意味</th><th>所要時間の目安</th><th>例</th></tr>
+      <tr><td><span class="item-diff d1">⭐☆☆</span></td><td>簡単 — URLを開いて撮るだけ／銘柄と時間足を選ぶだけ</td><td>1〜2分</td><td>ログイン画面、素チャート、経済カレンダー</td></tr>
+      <tr><td><span class="item-diff d2">⭐⭐☆</span></td><td>ふつう — インジ追加・色変更・描画ツール使用</td><td>3〜5分</td><td>水平線、MA200、ピボットポイント</td></tr>
+      <tr><td><span class="item-diff d3">⭐⭐⭐</span></td><td>むずい — 過去の特定場面探し、複合インジ、有料機能</td><td>5〜15分</td><td>ゴールデンクロス探し、RSIダイバージェンス、SMC系</td></tr>
+    </table>
+    <div class="tip">💡 ⭐☆☆ の項目から片付けるとテンポ良く進みます。⭐⭐⭐ はまとめて気力のある時間帯に。</div>
+
+    <h3>📬 10. 困ったら</h3>
     <ul>
       <li>項目の <strong>howto</strong>（チェックリストで項目をクリックすると表示される詳細）を読み返す</li>
       <li>それでも不明なら Claude Code のチャットで「#XX の手順を教えて」と聞く → 待機しなくても画像だけ送れば判定してくれる</li>
       <li>有料機能に遭遇した場合は、撮影せず運営者へ連絡</li>
     </ul>
 
-    <h3>🗓️ 10. 運用ルール</h3>
+    <h3>🗓️ 11. 運用ルール</h3>
     <ul>
       <li>作業時間の目安: 1項目あたり 3〜5分（調子が出てきたら2分/項目）</li>
       <li>1セッションで 10項目 終わらせて休憩、が目安</li>
@@ -443,6 +460,52 @@ const items = [
   {id:'mt4-vs-mt5_side-by-side', batch:3, cat:'8-C. MT4比較', name:'MT4 vs MT5 並列', filename:'08_mt5/mt4-vs-mt5_side-by-side.png', howto:['MT4とMT5を左右に並べる','同じ銘柄・時間足で比較']},
 ];
 
+// ========== 難易度判定 ==========
+// 1=簡単（URL開いてスクショだけ）/ 2=ふつう（チャート設定あり）/ 3=むずい（過去場面探し・複合設定）
+const DIFF_EASY = new Set([
+  // 1. UI - 画面開いて撮るだけ
+  'ui_register-page','ui_login-page','ui_plan-comparison','ui_homepage_chart-button',
+  'ui_empty-chart-initial','ui_three-areas-overview','ui_toolbar-left-full',
+  'ui_symbol-search_closed','ui_symbol-search_open-empty','ui_symbol-search_usdjpy','ui_symbol-search_xauusd','ui_symbol-search_btcusd',
+  'ui_timeframe-menu',
+  'ui_tool_horizontal-line','ui_tool_trend-line','ui_tool_parallel-channel','ui_tool_fibonacci',
+  'ui_indicator-search_empty','ui_indicator-search_ma','ui_indicator-search_volume',
+  'ui_alert_right-click-menu','ui_alert_manager-panel',
+  'ui_layout-save-dialog','ui_settings_appearance','ui_watchlist','ui_pine_editor_empty',
+  // 5. 機能 - URLを開いて撮るだけ
+  'feat_currency-strength','feat_economic-calendar','feat_news-feed','feat_heatmap-forex','feat_ideas-page','feat_stock-screener',
+  // 8. MT5 - 立ち上げて撮るだけ
+  'mt5_market-watch','mt5_navigator','mt5_new-order-dialog','mt5_indicators-list',
+]);
+const DIFF_HARD = new Set([
+  // 4. インジ - 複合設定・過去場面探し
+  'ind_rci_usdjpy_4h','ind_heikin-ashi_comparison','ind_ema-vs-sma_usdjpy_4h',
+  'ind_golden-cross_usdjpy_1d','ind_dead-cross_usdjpy_1d','ind_rsi-divergence_usdjpy_4h',
+  'ind_atr-stoploss_example','ind_bb-squeeze_usdjpy_1h','ind_bb-squeeze_ethusd_1h',
+  // 1. UI - 有料機能・発火待ち
+  'ui_alert_dialog_webhook','ui_alert_notification-popup','ui_strategy-tester_result','ui_mobile_alert-notification',
+  // 5. 機能 - 有料プラン＆4分割
+  'feat_multi-chart_4panels',
+  // 8. MT5 - EA必要・バックテスト
+  'mt5_ea-attached','mt5_strategy-tester_result','mt4-vs-mt5_side-by-side',
+]);
+function getDiff(it){
+  const id = it.id;
+  if(DIFF_EASY.has(id)) return 1;
+  if(DIFF_HARD.has(id)) return 3;
+  // 規則: クリーンチャートは銘柄選んで時間足変えるだけ
+  if(id.startsWith('clean_')) return 1;
+  // 規則: SMC/パターン/理論/PA/イベント は全て過去場面探しが必要
+  if(/^(smc_|pattern_|theory_|pa_|event_)/.test(id)) return 3;
+  // 規則: 加工チャートの ma-multi / all-indicators は4本以上の複合
+  if(/_(ma-multi|all-indicators)$/.test(id)) return 3;
+  // その他は「ふつう」
+  return 2;
+}
+function diffStars(n){
+  return '⭐'.repeat(n) + '☆'.repeat(3-n);
+}
+
 const STORAGE_KEY = 'hado-shooting-checklist-v1';
 const PREFILL_APPLIED_KEY = 'hado-shooting-checklist-prefilled-ids';
 // ローカルにファイルが存在する or チャットで承認済みの項目を初回訪問時に自動チェック
@@ -541,7 +604,8 @@ function render(){
       const done = !!state[it.id];
       const d = document.createElement('div');
       d.className = 'item'+(done?' done':'');
-      d.innerHTML = `<div class="item-row"><input type="checkbox" ${done?'checked':''} data-id="${it.id}"><span class="item-num">#${it._n}</span><span class="item-name">${esc(it.name)}</span><span class="item-caret">▶</span></div><div class="item-details"><div class="item-filename">${esc(it.filename)}</div><div class="item-howto"><ul>${(it.howto||[]).map(h=>`<li>${esc(h)}</li>`).join('')}</ul></div></div>`;
+      const dv = getDiff(it);
+      d.innerHTML = `<div class="item-row"><input type="checkbox" ${done?'checked':''} data-id="${it.id}"><span class="item-num">#${it._n}</span><span class="item-diff d${dv}" title="難易度 ${dv}/3">${diffStars(dv)}</span><span class="item-name">${esc(it.name)}</span><span class="item-caret">▶</span></div><div class="item-details"><div class="item-filename">${esc(it.filename)}</div><div class="item-howto"><ul>${(it.howto||[]).map(h=>`<li>${esc(h)}</li>`).join('')}</ul></div></div>`;
       list.appendChild(d);
     });
   });
