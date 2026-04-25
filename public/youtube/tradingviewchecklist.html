@@ -141,16 +141,20 @@
     </ul>
 
     <h3>🖼️ 4. 画面設定（固定）</h3>
+    <p>PC（TradingView Web / MT5デスクトップ）とアプリ（モバイル）で共通の設定値：</p>
     <table>
       <tr><th>項目</th><th>設定値</th></tr>
-      <tr><td>背景</td><td>黒（ダークテーマ）</td></tr>
+      <tr><td>背景</td><td>黒（ダークテーマ / Black on Black）</td></tr>
       <tr><td>タイムゾーン</td><td>UTC+9（日本時間）</td></tr>
       <tr><td>ローソク陽線色</td><td><code>#26A69A</code></td></tr>
       <tr><td>ローソク陰線色</td><td><code>#EF5350</code></td></tr>
       <tr><td>グリッド</td><td>デフォルト（薄いグレー）</td></tr>
-      <tr><td>画面比率</td><td>16:9 を推奨（Remotion合成向け）</td></tr>
+      <tr><td>画面比率</td><td>16:9 を推奨（Remotion合成向け）／アプリは横画面ロック</td></tr>
       <tr><td>左上の凡例（インジ名）</td><td>表示ON（インジ設定値の確認用）</td></tr>
+      <tr><td><strong>📱 アプリ追加: アカウント情報</strong></td><td><strong>未ログイン or デモ口座のみ</strong>。ブローカー連携・リアル口座は絶対NG（残高/証拠金/口座番号が映る）</td></tr>
+      <tr><td><strong>📱 アプリ追加: システムバー</strong></td><td>全画面モード or 撮影後に <strong>上部60px・下部100〜120pxをクロップ</strong></td></tr>
     </table>
+    <div class="tip">💡 アプリ撮影の詳細セットアップは <strong>マニュアル §10</strong> 参照。TVモバイル / MT5モバイルそれぞれの手順あり。</div>
 
     <h3>💳 5. 無料プラン vs 有料プラン</h3>
     <p>TradingView には無料プランと有料プラン（Pro, Pro+, Premium）があります。以下が撮影に関係する違い：</p>
@@ -178,6 +182,8 @@
       <li><strong>ラインのデフォルト色（ピンク）</strong> — 必ず上記の緑/赤/紫に変更し「既定として保存」</li>
       <li><strong>縦ズーム不足</strong> — R1-R3やS1-S3が画面外。価格軸を上下ドラッグして縮小すると全体が見える</li>
       <li><strong>チャート種類切替が見つからない</strong> — 「平均足」はインジケーター追加ではなく<strong>チャート種類切替</strong>（上部ツールバーのローソク足アイコン横のメニュー）</li>
+      <li><strong>📱 アプリ撮影で口座情報が映る</strong> — TV/MT5モバイルで<strong>ログイン済み + ブローカー連携 or リアル口座</strong>のまま撮ると、画面に残高・証拠金・口座番号が出てしまう。マニュアル §10 の通り <strong>未ログイン or デモ口座のみ</strong> で撮影し、撮影後にも口座情報が映ってないか必ず目視確認する</li>
+      <li><strong>📱 アプリ撮影で上下のシステムバーが残る</strong> — iPhone/Android のステータスバー（時計・電池）や下部タブバーが入ったまま。<strong>全画面モード</strong>で撮るか、撮影後に上部60px / 下部100〜120pxをクロップする</li>
     </ol>
 
     <h3>📎 7. お手本スクショ（既存素材）</h3>
@@ -250,14 +256,63 @@ checklist.html の該当項目の howto を元に案内してください。</pr
     </table>
     <div class="tip">💡 ⭐☆☆ の項目から片付けるとテンポ良く進みます。⭐⭐⭐ はまとめて気力のある時間帯に。</div>
 
-    <h3>📬 10. 困ったら</h3>
+    <h3>📱 10. アプリ撮影（TVモバイル / MT5モバイル）</h3>
+    <p>2026-04-25 追記。<strong>§1-I（モバイル）と §8-B（MT5モバイル）はスマホアプリで撮影します</strong>。PCでは撮れない or アプリで撮ったほうが自然な絵になるためです。撮る前に必ず以下のセットアップを済ませること。</p>
+
+    <h4>📲 10-A. TradingViewモバイルアプリ</h4>
+    <ol>
+      <li><strong>未ログイン状態で起動するのが一番ラク</strong>（ログインしなくてもチャート閲覧は可能）。ログイン済みなら：プロフィール → 設定 → ログアウト</li>
+      <li><strong>ブローカー連携している場合は必ず解除</strong>（チャート右上に残高/証拠金が出てしまう）</li>
+      <li>プロフィール → 設定 → 外観 → <strong>「ダーク」</strong></li>
+      <li>チャート画面右下「⋮」or 歯車 → 配色を背景 <code>#000000</code> / 陽線 <code>#26a69a</code> / 陰線 <code>#ef5350</code></li>
+      <li>シンボル名水印（Watermark）: <strong>非表示</strong></li>
+      <li>撮影時は<strong>全画面モード</strong>（チャート画面右上「⛶」）。全画面が無いバージョンは<strong>スクショ後に下部100〜150pxをクロップ</strong></li>
+      <li>上部ステータスバー（時計・電池・通信）は<strong>おやすみモード/集中モードON</strong>で通知バッジを消す</li>
+      <li><strong>横画面（ランドスケープ）固定</strong>で撮影</li>
+      <li>iOS: サイドボタン+音量上 → 写真アプリ → AirDrop/iCloudでMacへ。Android: 電源+音量下 → Google Drive/USBで Mac へ</li>
+    </ol>
+
+    <h4>📲 10-B. MT5モバイルアプリ（#107 でメイン使用）</h4>
+    <div class="warn">⚠️ MT5モバイルはチャート上部に<strong>口座番号・残高・証拠金</strong>が出ます。リアル口座は絶対に使わない。デモ口座のみで撮影してください。</div>
+    <ol>
+      <li><strong>デモ口座のみでログイン</strong>（リアル口座は絶対NG。残高が映るリスク）。既にリアル口座がある場合は: 設定 → 口座管理 → リアルを削除 or 一時的にデモへ切替</li>
+      <li>設定 → チャート → 配色 → <strong>「Black on Black」</strong>または「Green on Black」</li>
+      <li>チャート画面で「i」マーク（情報パネル）を<strong>OFF</strong></li>
+      <li>チャート → 設定 → <strong>「取引レベルの表示」をOFF</strong>（ポジションラインを消す）</li>
+      <li>OHLC表示は<strong>ON</strong>（教育上必要）、Bid/Askライン は<strong>OFF</strong> 推奨</li>
+      <li>下部ツールバーは全画面アイコン（右上の四角）で隠す。隠せないバージョンは<strong>下部100pxクロップ</strong></li>
+      <li>上部に口座番号が出る場合は<strong>撮影後に上部60pxを一律クロップ</strong></li>
+      <li><strong>横画面固定</strong>で撮影</li>
+      <li><strong>本番前に確認用1枚</strong>を撮って、口座番号・残高・証拠金・ロットが映ってないことを確認してから本番開始</li>
+    </ol>
+
+    <h4>📂 10-C. 保存先と一括クロップ</h4>
+    <p>アプリから来た原寸スクショは <code>_mobile_raw/</code> に置き、クロップ・リネーム後に親カテゴリへ移動：</p>
+    <pre style="background:#0a0a0a;border:1px solid #333;border-radius:6px;padding:10px;overflow-x:auto;font-family:'Monaco',monospace;font-size:11px;color:#d0d0d0;line-height:1.5">02_charts_clean/_mobile_raw/IMG_1234.png
+  → 02_charts_clean/clean_usdjpy_4h.png</pre>
+    <p>iPhoneの長辺横スクショを上下一括クロップする場合（要 <code>brew install imagemagick</code>）：</p>
+    <pre style="background:#0a0a0a;border:1px solid #333;border-radius:6px;padding:10px;overflow-x:auto;font-family:'Monaco',monospace;font-size:11px;color:#d0d0d0;line-height:1.5">cd /path/to/_mobile_raw
+for f in *.png; do
+  magick "$f" -gravity North -chop 0x60 -gravity South -chop 0x120 "../${f}"
+done</pre>
+
+    <h4>✅ 10-D. 撮影後の必須チェック（アプリ分は最重要）</h4>
+    <ul>
+      <li>口座番号・残高・証拠金・有効証拠金・ロット数値が<strong>1枚も映っていない</strong>こと</li>
+      <li>ブローカー名（Axon / XM / Exness など）が映っていない</li>
+      <li>上部ステータスバー（時計・電池・通信キャリア名）がクロップ済み</li>
+      <li>下部タブバーがクロップ or 全画面で消えている</li>
+      <li>短辺1200px以上（PC版は1920×1080以上）</li>
+    </ul>
+
+    <h3>📬 11. 困ったら</h3>
     <ul>
       <li>項目の <strong>howto</strong>（チェックリストで項目をクリックすると表示される詳細）を読み返す</li>
       <li>それでも不明なら Claude Code のチャットで「#XX の手順を教えて」と聞く → 待機しなくても画像だけ送れば判定してくれる</li>
       <li>有料機能に遭遇した場合は、撮影せず運営者へ連絡</li>
     </ul>
 
-    <h3>🗓️ 11. 運用ルール</h3>
+    <h3>🗓️ 12. 運用ルール</h3>
     <ul>
       <li>作業時間の目安: 1項目あたり 3〜5分（調子が出てきたら2分/項目）</li>
       <li>1セッションで 10項目 終わらせて休憩、が目安</li>
@@ -422,8 +477,8 @@ const items = [
   {id:'ui_pine_editor_sample-indicator', batch:2, cat:'1-H. Pine・ストラテジー', name:'Pine Editor（サンプルInd）', filename:'01_ui/ui_pine_editor_sample-indicator.png', howto:['Pine Editor → 「開く」→ 組み込みインジのコード','または New→Indicatorでテンプレ表示']},
   {id:'ui_pine_editor_sample-strategy', batch:2, cat:'1-H. Pine・ストラテジー', name:'Pine Editor（サンプルStrategy）', filename:'01_ui/ui_pine_editor_sample-strategy.png', howto:['New→Strategy でテンプレ戦略コード表示']},
   {id:'ui_strategy-tester_result', batch:2, cat:'1-H. Pine・ストラテジー', name:'ストラテジーテスター結果', filename:'01_ui/ui_strategy-tester_result.png', howto:['ストラテジーを適用して結果タブ表示','資産曲線・統計が見える']},
-  {id:'ui_mobile_chart', batch:2, cat:'1-I. モバイル', name:'TVモバイルアプリ チャート', filename:'01_ui/ui_mobile_chart.png', howto:['iOS/AndroidのTradingViewアプリ','チャート画面をスクリーンショット','AirDropでMacへ']},
-  {id:'ui_mobile_alert-notification', batch:2, cat:'1-I. モバイル', name:'スマホの通知バー', filename:'01_ui/ui_mobile_alert-notification.png', howto:['スマホにTVアラート通知が来た瞬間','通知センター表示']},
+  {id:'ui_mobile_chart', batch:2, cat:'1-I. モバイル', name:'TVモバイルアプリ チャート', filename:'01_ui/ui_mobile_chart.png', howto:['📱 アプリ撮影。マニュアル §10-A のセットアップ済みであること（未ログイン or ブローカー解除 / ダーク / 横画面）','① アプリ起動 → 検索 → USDJPY 選択','② 時間足を 4h に設定','③ 水平線を1本だけ引く（賑わせ用）','④ 全画面アイコンで上下UIを最小化','⑤ ステータスバー（時計・電池）が映る場合は撮影後に上部60pxクロップ','⑥ AirDrop/iCloud で Mac へ → 01_ui/_mobile_raw/ → リネーム']},
+  {id:'ui_mobile_alert-notification', batch:2, cat:'1-I. モバイル', name:'スマホの通知バー', filename:'01_ui/ui_mobile_alert-notification.png', howto:['📱 アプリ撮影。アラート発火させて通知を撮る','① 事前にPC版TVで適当な水平線アラートを設定（USDJPY 現在値の近く）','② 価格が水平線にタッチするとスマホアプリにプッシュ通知が来る','③ ロック画面 or 通知センターを表示してスクショ','④ 通知が来ない/待てない場合: スクショ加工で「アラート通知のサンプル画像」として合成OK（その場合はファイル名を ui_mobile_alert-notification_composite.png に変更）']},
 
   // --- 5. TV機能系 (14) ---
   {id:'feat_currency-strength', batch:2, cat:'5. TV機能系', name:'通貨強弱（Forex Cross Rates）', filename:'05_features/feat_currency-strength.png', howto:['https://www.tradingview.com/markets/currencies/rates-major/','Cross Rates表']},
@@ -453,9 +508,9 @@ const items = [
   {id:'mt5_strategy-tester_setup', batch:3, cat:'8-A. MT5デスクトップ', name:'ストラテジーテスター設定', filename:'08_mt5/mt5_strategy-tester_setup.png', howto:['Ctrl+R でストラテジーテスター','EAと期間設定の画面']},
   {id:'mt5_strategy-tester_result', batch:3, cat:'8-A. MT5デスクトップ', name:'バックテスト結果', filename:'08_mt5/mt5_strategy-tester_result.png', howto:['バックテスト完了後の結果グラフ','資産曲線が見える']},
   {id:'mt5_indicators-list', batch:3, cat:'8-A. MT5デスクトップ', name:'インジケーター一覧', filename:'08_mt5/mt5_indicators-list.png', howto:['挿入メニュー→インジケーター','標準インジのサブメニュー展開']},
-  {id:'mt5_mobile_chart', batch:3, cat:'8-B. MT5モバイル', name:'MT5スマホ チャート', filename:'08_mt5/mt5_mobile_chart.png', howto:['スマホのMT5アプリ','チャート画面をスクショ→AirDrop']},
-  {id:'mt5_mobile_new-order', batch:3, cat:'8-B. MT5モバイル', name:'MT5スマホ 注文画面', filename:'08_mt5/mt5_mobile_new-order.png', howto:['スマホのMT5で新規注文画面']},
-  {id:'mt5_mobile_positions', batch:3, cat:'8-B. MT5モバイル', name:'MT5スマホ ポジション一覧', filename:'08_mt5/mt5_mobile_positions.png', howto:['スマホのMT5でポジション一覧']},
+  {id:'mt5_mobile_chart', batch:3, cat:'8-B. MT5モバイル', name:'MT5スマホ チャート（素チャート）', filename:'08_mt5/mt5_mobile_chart.png', howto:['📱 アプリ撮影。マニュアル §10-B のセットアップ済みであること（デモ口座のみ / Black on Black / 取引レベル非表示）','⚠️ 撮影前に必ず確認用1枚を撮って「口座番号・残高・証拠金・ロット」が映ってないこと確認','① 下部メニュー「チャート」タブを開く','② 銘柄を USDJPY、時間足を H4 に設定','③ 「i」情報パネル OFF、取引レベル OFF を再確認','④ 横画面で全画面表示にしてスクショ','⑤ 撮影後、上部60px・下部100pxをクロップ']},
+  {id:'mt5_mobile_new-order', batch:3, cat:'8-B. MT5モバイル', name:'MT5スマホ 注文画面', filename:'08_mt5/mt5_mobile_new-order.png', howto:['📱 アプリ撮影（デモ口座のみ）','① チャート画面で「+トレード」アイコン or 銘柄をタップ → 「新規注文」','② 注文タイプ「成行」/ ロット 0.01（最小値で残高への影響を抑える）/ SL,TP 空欄','③ 注文ダイアログ全体が見える状態でスクショ','④ ⚠️ 撮影後に注文は確定せずキャンセル（デモでもポジションを残さない）','⑤ 上部の口座番号がある場合はクロップ']},
+  {id:'mt5_mobile_positions', batch:3, cat:'8-B. MT5モバイル', name:'MT5スマホ ポジション一覧', filename:'08_mt5/mt5_mobile_positions.png', howto:['📱 アプリ撮影（デモ口座のみ）','① 撮影用にデモ口座で USDJPY 0.01ロットを成行で1ポジションだけ保有','② 下部メニュー「トレード」タブを開く','③ 残高/証拠金は数値が映るが、デモ口座であれば公開OK（ただし口座番号は映さないこと）','④ 撮影後、口座番号部分（上部）をクロップ or モザイクで消す','⑤ ⚠️ 撮影完了後に必ずポジションを決済すること']},
   {id:'mt4_chart_usdjpy_4h', batch:3, cat:'8-C. MT4比較', name:'MT4 USDJPY 4H（比較用）', filename:'08_mt5/mt4_chart_usdjpy_4h.png', howto:['MT4アプリでUSDJPY 4H表示']},
   {id:'mt4-vs-mt5_side-by-side', batch:3, cat:'8-C. MT4比較', name:'MT4 vs MT5 並列', filename:'08_mt5/mt4-vs-mt5_side-by-side.png', howto:['MT4とMT5を左右に並べる','同じ銘柄・時間足で比較']},
 ];
