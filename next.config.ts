@@ -35,6 +35,11 @@ const nextConfig: NextConfig = {
           destination: "https://signalath.com/freecontents/offer/:path*",
           basePath: false,
         },
+        {
+          source: "/coefont/:path*",
+          destination: "https://signalath.com/freecontents/coefont/:path*",
+          basePath: false,
+        },
       ],
     };
   },
