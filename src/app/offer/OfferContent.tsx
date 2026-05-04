@@ -18,12 +18,68 @@ export default function OfferContent({ axonLink, discordLink }: OfferContentProp
             <span className="text-blue-400">無料申請ガイド</span>
           </h1>
           <p className="text-gray-400 text-sm">
-            ※作業時間は平均20分ほどです。スマホ・PCどちらでも申請可能です。
+            ※作業時間は平均15分ほどです。スマホ・パソコンどちらでも申請可能です。
+          </p>
+        </div>
+      </section>
+
+      {/* Chart Demo */}
+      <section className="px-4 pb-2">
+        <div className="max-w-3xl mx-auto">
+          <div className="rounded-2xl overflow-hidden border border-blue-900/40 shadow-xl shadow-blue-950/30">
+            <img
+              src="/images/chart-demo.jpg"
+              alt="波動シグナルインジケーター — BTCUSDT 1時間足チャート実例"
+              className="w-full h-auto"
+            />
+          </div>
+          <p className="text-center text-xs text-gray-500 mt-2">
+            ▲ 実際のTradingViewチャート（BTCUSDT 1時間足）/ BUYシグナル・TP・SLラインが自動表示
           </p>
         </div>
       </section>
 
       <div className="max-w-3xl mx-auto px-4 pb-20 space-y-12">
+
+        {/* Appeal Section */}
+        <section className="space-y-4">
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { value: "59%", label: "勝率" },
+              { value: "+40%", label: "資産増加（2ヶ月）" },
+              { value: "∞", label: "条件付き無料・無期限" },
+            ].map((s) => (
+              <div key={s.label} className="bg-blue-950/40 border border-blue-800/40 rounded-xl p-4 text-center">
+                <p className="text-2xl font-bold text-blue-300">{s.value}</p>
+                <p className="text-xs text-gray-400 mt-1">{s.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Why free */}
+          <div className="bg-gray-900/60 border border-gray-700 rounded-2xl p-6 space-y-4 text-sm text-gray-300">
+            <p className="text-white font-bold text-base">なぜ無料で使えるのか</p>
+            <p>
+              このシステムは、現役のSMCトレーダーとAIエンジニアチームが
+              有志で開発したオリジナルのインジケーターです。
+              本来であれば<span className="text-white font-semibold">100万円以上</span>で販売されるクオリティですが、
+              開発の目的が「取引データの収集」および「日本人のトレード成績の向上」であるため、
+              条件を満たした方に限り、永久に無料でお渡ししています。
+            </p>
+            <div className="bg-blue-950/30 border border-blue-800/30 rounded-xl p-4 space-y-2">
+              <p className="text-blue-300 font-semibold text-xs uppercase tracking-widest">2ヶ月間の実運用テスト結果</p>
+              <p className="text-white text-lg font-bold">シグナル通りのトレードで勝率59%・資産+40%超え</p>
+              <p className="text-gray-400 text-xs">※過去の実績は将来の利益を保証するものではありません</p>
+            </div>
+            <p>
+              条件はシンプルで、<span className="text-white font-semibold">専用リンクからの口座開設と最低入金（30,000円〜）のみ</span>。
+              入金した資金はそのままトレードに使用でき、利用料として差し引かれることはありません。
+              一度条件を満たせば、その後は<span className="text-white font-semibold">永久に無料</span>で使い続けられます。
+            </p>
+          </div>
+        </section>
+
         {/* Flow Overview */}
         <section className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
           <h2 className="text-xl font-bold mb-4 text-blue-400">受け取りまでの流れ（5ステップ）</h2>
@@ -193,7 +249,13 @@ export default function OfferContent({ axonLink, discordLink }: OfferContentProp
         <section>
           <StepHeader num={6} title="インジケーター申請フォームを入力する" />
           <div className="mt-4 text-sm text-gray-300 space-y-4">
-            <p>Discord内の「指標承認センター」チャンネルにある申請フォームに必要情報を入力してください。</p>
+            <p>以下のボタンから申請フォームに進み、必要情報を入力してください。</p>
+            <a
+              href="/apply"
+              className="block w-full bg-blue-600 hover:bg-blue-500 text-white text-center font-bold py-4 rounded-xl transition-colors text-lg"
+            >
+              インジケーター申請フォームへ進む
+            </a>
             <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 space-y-2">
               <p className="font-bold text-white">申請フォームの入力項目</p>
               <ul className="space-y-1 list-none">
