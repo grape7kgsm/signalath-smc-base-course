@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "analyze:video": "node scripts/analyze-latest-video.mjs"
+    "analyze:video": "node scripts/analyze-latest-video.mjs",
+    "yt:login": "node scripts/youtube-oauth-login.mjs"
   },
   "dependencies": {
     "next": "16.2.1",

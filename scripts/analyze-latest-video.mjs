@@ -1,25 +1,36 @@
 #!/usr/bin/env node
 // 最新の公開動画が「滑った」原因を分析する CLI。
 //
-// 接続: YouTube Data API v3 (API キー認証)。
-// 取得できる数値: 再生数 / 高評価 / コメント数 / 公開日時 / 尺。
-// 取得できない数値: 視聴維持率・CTR(インプレッションクリック率)・
-//   トラフィックソース。これらは YouTube Analytics API + チャンネル所有者
-//   OAuth2 が必須で API キーでは不可。本スクリプトは Data API の公開数値と
-//   data/contents.json の台本を突き合わせて「滑った原因の仮説」を出す。
+// 接続:
+//  - YouTube Data API v3 (APIキー): 再生数 / 高評価 / コメント / 尺
+//  - YouTube Analytics API (OAuth2, 任意): 平均視聴維持率 / 視聴時間 /
+//    登録者増 / シェア。`npm run yt:login` で連携すると自動で使われる。
+// 非提供: インプレッション/サムネCTR は Analytics reports.query では取れず、
+//   確定には YouTube Reporting API のバルクレポートが別途必要。
 //
-// 必要な環境変数:
-//   YOUTUBE_API_KEY      … Google Cloud で発行した YouTube Data API v3 キー
-//   YOUTUBE_CHANNEL_ID   … "UC..." のチャンネルID、または "@handle"
+// 必要な環境変数（export か .env.youtube.local）:
+//   YOUTUBE_API_KEY              … YouTube Data API v3 キー（必須）
+//   YOUTUBE_CHANNEL_ID           … "UC..." または "@handle"（必須）
+//   YOUTUBE_OAUTH_CLIENT_ID      … 維持率分析を使う場合（任意）
+//   YOUTUBE_OAUTH_CLIENT_SECRET  … 同上
+//   YOUTUBE_OAUTH_REFRESH_TOKEN  … `npm run yt:login` が自動生成
 //
 // 実行: npm run analyze:video
 
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import {
+  loadLocalEnv,
+  getAccessToken,
+  hasOAuthConfig,
+} from "./lib/yt-auth.mjs";
 
 const API_BASE = "https://www.googleapis.com/youtube/v3";
+const ANALYTICS_BASE = "https://youtubeanalytics.googleapis.com/v2/reports";
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+await loadLocalEnv();
 
 const API_KEY = process.env.YOUTUBE_API_KEY;
 const CHANNEL = process.env.YOUTUBE_CHANNEL_ID;
@@ -128,6 +139,46 @@ function matchChapter(video, chapters) {
   return bestScore > 0 ? best : null;
 }
 
+// OAuth が設定されていれば YouTube Analytics API で維持率等を取得。
+// 注: インプレッション/サムネCTR は Analytics API(reports.query) では
+// 提供されない（YouTube Reporting API のバルクレポートが別途必要）。
+async function fetchAnalytics(videoId, startDate) {
+  const accessToken = await getAccessToken({
+    clientId: process.env.YOUTUBE_OAUTH_CLIENT_ID,
+    clientSecret: process.env.YOUTUBE_OAUTH_CLIENT_SECRET,
+    refreshToken: process.env.YOUTUBE_OAUTH_REFRESH_TOKEN,
+  });
+  const today = new Date().toISOString().slice(0, 10);
+  const url = new URL(ANALYTICS_BASE);
+  url.searchParams.set("ids", "channel==MINE");
+  url.searchParams.set("startDate", startDate);
+  url.searchParams.set("endDate", today);
+  url.searchParams.set(
+    "metrics",
+    "views,estimatedMinutesWatched,averageViewDuration," +
+      "averageViewPercentage,subscribersGained,shares,likes",
+  );
+  url.searchParams.set("filters", `video==${videoId}`);
+
+  const res = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) {
+    throw new Error(
+      `YouTube Analytics API 失敗 (${res.status}): ${await res.text()}`,
+    );
+  }
+  const json = await res.json();
+  const row = json.rows?.[0];
+  if (!row) return null;
+  const cols = json.columnHeaders.map((c) => c.name);
+  const out = {};
+  cols.forEach((name, i) => {
+    out[name] = row[i];
+  });
+  return out;
+}
+
 async function main() {
   const videos = await getLatestVideos(8);
   if (videos.length === 0) {
@@ -159,6 +210,19 @@ async function main() {
   );
   const chapter = matchChapter(latest, contents);
 
+  let analytics = null;
+  let analyticsError = null;
+  if (hasOAuthConfig()) {
+    try {
+      analytics = await fetchAnalytics(
+        latest.videoId,
+        latest.publishedAt.slice(0, 10),
+      );
+    } catch (e) {
+      analyticsError = e.message;
+    }
+  }
+
   const line = "─".repeat(60);
   console.log(`\n${line}`);
   console.log("最新公開動画の分析レポート");
@@ -189,8 +253,62 @@ async function main() {
     `  コメント率  : ${pct(commentRate)}  (過去中央値 ${pct(medCommentRate)})`,
   );
 
+  console.log(`\n■ Analytics（OAuth / 公開〜現在の累計）`);
+  if (analytics) {
+    console.log(
+      `  平均視聴維持率 : ${Number(
+        analytics.averageViewPercentage ?? 0,
+      ).toFixed(1)}%`,
+    );
+    console.log(
+      `  平均視聴時間   : ${Math.round(
+        Number(analytics.averageViewDuration ?? 0),
+      )}秒`,
+    );
+    console.log(
+      `  総視聴時間     : ${Math.round(
+        Number(analytics.estimatedMinutesWatched ?? 0),
+      ).toLocaleString()}分`,
+    );
+    console.log(
+      `  登録者増加     : ${Number(analytics.subscribersGained ?? 0)}人`,
+    );
+    console.log(`  シェア数       : ${Number(analytics.shares ?? 0)}回`);
+    console.log(
+      `  ※ インプレCTR/サムネCTR は Analytics reports.query では非提供。` +
+        `確定には YouTube Reporting API のバルクレポートが必要。`,
+    );
+  } else if (analyticsError) {
+    console.log(`  取得失敗: ${analyticsError}`);
+  } else {
+    console.log(
+      "  OAuth 未設定のため維持率は取得不可。`npm run yt:login` で連携すると" +
+        "維持率・視聴時間・登録者増を含めて分析できます。",
+    );
+  }
+
   // 「滑った」判定ヒューリスティック
   const findings = [];
+  const avgViewPct = analytics
+    ? Number(analytics.averageViewPercentage ?? 0)
+    : null;
+  if (avgViewPct !== null && avgViewPct < 35) {
+    findings.push(
+      `平均視聴維持率が${avgViewPct.toFixed(1)}%と低い（目安40%超）→ ` +
+        `冒頭〜中盤で離脱。フック弱さ/前置きの長さ/テンポが主因の可能性大。`,
+    );
+  }
+  if (
+    avgViewPct !== null &&
+    medViews &&
+    latest.viewCount < medViews * 0.6 &&
+    avgViewPct >= 40
+  ) {
+    findings.push(
+      `維持率は悪くないのに再生数が伸びていない → 内容ではなく入口` +
+        `（サムネ/タイトル/インプレッション）側の問題。サムネ差し替えが最優先。`,
+    );
+  }
   if (medViews && latest.viewCount < medViews * 0.6) {
     findings.push(
       `再生数が過去中央値の${(
@@ -229,8 +347,11 @@ async function main() {
   }
   if (findings.length === 0) {
     findings.push(
-      "公開数値上は致命的な落ち込みは検出されず。滑った感の主因は" +
-        "インプレッション/維持率側（Analytics 必須）の可能性が高い。",
+      analytics
+        ? "数値・維持率ともに致命的な落ち込みは検出されず。体感の" +
+            "『滑った』はアルゴリズム露出の揺らぎ/公開タイミングの可能性。"
+        : "公開数値上は致命的な落ち込みは検出されず。維持率/CTR" +
+            "（OAuth/Reporting 必須）側の確認を推奨。",
     );
   }
 
@@ -277,7 +398,10 @@ async function main() {
     "  3. 冒頭15秒で『この動画で何が手に入るか』を断定形で提示",
   );
   console.log(
-    "  4. 維持率/CTRの確定値が必要なら YouTube Analytics API(OAuth)接続を追加",
+    analytics
+      ? "  4. 維持率グラフの離脱点に対応する台本セクションを特定し再編集" +
+          "（サムネCTRの確定が要るなら YouTube Reporting API を追加）"
+      : "  4. `npm run yt:login` で OAuth 連携し、維持率込みで再分析",
   );
   console.log(`${line}\n`);
 }
