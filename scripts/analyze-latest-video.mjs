@@ -5,15 +5,16 @@
 //  - YouTube Data API v3 (APIキー): 再生数 / 高評価 / コメント / 尺
 //  - YouTube Analytics API (OAuth2, 任意): 平均視聴維持率 / 視聴時間 /
 //    登録者増 / シェア。`npm run yt:login` で連携すると自動で使われる。
-// 非提供: インプレッション/サムネCTR は Analytics reports.query では取れず、
-//   確定には YouTube Reporting API のバルクレポートが別途必要。
+//  - YouTube Reporting API (OAuth2, 任意): インプレッション / サムネCTR。
+//    `npm run yt:reporting-setup` でジョブ作成。生成まで24〜48h。
 //
 // 必要な環境変数（export か .env.youtube.local）:
 //   YOUTUBE_API_KEY              … YouTube Data API v3 キー（必須）
 //   YOUTUBE_CHANNEL_ID           … "UC..." または "@handle"（必須）
-//   YOUTUBE_OAUTH_CLIENT_ID      … 維持率分析を使う場合（任意）
+//   YOUTUBE_OAUTH_CLIENT_ID      … 維持率/CTR分析を使う場合（任意）
 //   YOUTUBE_OAUTH_CLIENT_SECRET  … 同上
 //   YOUTUBE_OAUTH_REFRESH_TOKEN  … `npm run yt:login` が自動生成
+//   YOUTUBE_REPORTING_JOB_ID     … `npm run yt:reporting-setup` が自動生成
 //
 // 実行: npm run analyze:video
 
@@ -25,6 +26,7 @@ import {
   getAccessToken,
   hasOAuthConfig,
 } from "./lib/yt-auth.mjs";
+import { fetchVideoImpressions } from "./lib/yt-reporting.mjs";
 
 const API_BASE = "https://www.googleapis.com/youtube/v3";
 const ANALYTICS_BASE = "https://youtubeanalytics.googleapis.com/v2/reports";
@@ -223,6 +225,25 @@ async function main() {
     }
   }
 
+  let reporting = null;
+  let reportingError = null;
+  const jobId = process.env.YOUTUBE_REPORTING_JOB_ID;
+  if (hasOAuthConfig() && jobId) {
+    try {
+      reporting = await fetchVideoImpressions({
+        jobId,
+        videoId: latest.videoId,
+        auth: {
+          clientId: process.env.YOUTUBE_OAUTH_CLIENT_ID,
+          clientSecret: process.env.YOUTUBE_OAUTH_CLIENT_SECRET,
+          refreshToken: process.env.YOUTUBE_OAUTH_REFRESH_TOKEN,
+        },
+      });
+    } catch (e) {
+      reportingError = e.message;
+    }
+  }
+
   const line = "─".repeat(60);
   console.log(`\n${line}`);
   console.log("最新公開動画の分析レポート");
@@ -274,16 +295,43 @@ async function main() {
       `  登録者増加     : ${Number(analytics.subscribersGained ?? 0)}人`,
     );
     console.log(`  シェア数       : ${Number(analytics.shares ?? 0)}回`);
-    console.log(
-      `  ※ インプレCTR/サムネCTR は Analytics reports.query では非提供。` +
-        `確定には YouTube Reporting API のバルクレポートが必要。`,
-    );
   } else if (analyticsError) {
     console.log(`  取得失敗: ${analyticsError}`);
   } else {
     console.log(
       "  OAuth 未設定のため維持率は取得不可。`npm run yt:login` で連携すると" +
         "維持率・視聴時間・登録者増を含めて分析できます。",
+    );
+  }
+
+  console.log(`\n■ Reporting（インプレッション / サムネCTR）`);
+  let ctrPct = null;
+  if (reporting && typeof reporting.impressions === "number") {
+    ctrPct = reporting.ctr * 100;
+    console.log(
+      `  インプレッション : ${reporting.impressions.toLocaleString()}` +
+        `（直近${reporting.reportsScanned}レポート / 該当${reporting.days}日分）`,
+    );
+    console.log(`  サムネCTR        : ${ctrPct.toFixed(2)}%`);
+    console.log(
+      "  ※ レポート対象期間内の集計。公開直後は対象日数が少ない点に注意。",
+    );
+  } else if (reporting && reporting.pending) {
+    console.log(
+      "  ジョブ作成直後でレポート未生成（生成まで24〜48h）。" +
+        "数日後に再実行するとCTRが反映されます。",
+    );
+  } else if (reporting && reporting.noImpressionColumns) {
+    console.log(
+      "  ジョブのレポート種別に impressions 列がありません。" +
+        "YOUTUBE_REPORTING_REPORT_TYPE を変えて `npm run yt:reporting-setup` を再実行。",
+    );
+  } else if (reportingError) {
+    console.log(`  取得失敗: ${reportingError}`);
+  } else {
+    console.log(
+      "  未設定。`npm run yt:reporting-setup` でジョブを作成すると、" +
+        "数日後からインプレッション/サムネCTRを取得できます。",
     );
   }
 
@@ -307,6 +355,18 @@ async function main() {
     findings.push(
       `維持率は悪くないのに再生数が伸びていない → 内容ではなく入口` +
         `（サムネ/タイトル/インプレッション）側の問題。サムネ差し替えが最優先。`,
+    );
+  }
+  if (ctrPct !== null && ctrPct < 4) {
+    findings.push(
+      `サムネCTRが${ctrPct.toFixed(2)}%と低い（目安4〜6%超）→ ` +
+        `サムネ/タイトルがクリックを取れていない。最優先で差し替え。`,
+    );
+  }
+  if (ctrPct !== null && ctrPct >= 5 && avgViewPct !== null && avgViewPct < 35) {
+    findings.push(
+      `CTRは取れているのに維持率が低い → 期待と中身のギャップ` +
+        `（タイトル/サムネと冒頭の不一致）。冒頭で約束を即回収する構成へ。`,
     );
   }
   if (medViews && latest.viewCount < medViews * 0.6) {
@@ -397,12 +457,18 @@ async function main() {
   console.log(
     "  3. 冒頭15秒で『この動画で何が手に入るか』を断定形で提示",
   );
-  console.log(
-    analytics
-      ? "  4. 維持率グラフの離脱点に対応する台本セクションを特定し再編集" +
-          "（サムネCTRの確定が要るなら YouTube Reporting API を追加）"
-      : "  4. `npm run yt:login` で OAuth 連携し、維持率込みで再分析",
-  );
+  let action4;
+  if (analytics && ctrPct !== null) {
+    action4 =
+      "  4. CTR×維持率のマトリクスで打ち手を確定" +
+      "（CTR低→サムネ / 維持率低→冒頭・構成 / 両方良いのに再生低→投稿時間・露出）";
+  } else if (analytics) {
+    action4 =
+      "  4. `npm run yt:reporting-setup` でサムネCTRも取得し入口/中身を切り分け";
+  } else {
+    action4 = "  4. `npm run yt:login` で OAuth 連携し、維持率込みで再分析";
+  }
+  console.log(action4);
   console.log(`${line}\n`);
 }
 
