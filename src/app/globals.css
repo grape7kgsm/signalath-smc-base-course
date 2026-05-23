@@ -4,7 +4,738 @@
   --font-sans: var(--font-geist-sans);
 }
 
+html {
+  scroll-behavior: smooth;
+}
 body {
   background: #0a0a0f;
   color: #e5e5e5;
+}
+
+/* ===== offer ページ ヒーローヘッダー ===== */
+.offer-hero {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 2.8rem 1.25rem 2.3rem;
+  background:
+    radial-gradient(130% 110% at 50% 0%, rgba(99, 102, 241, 0.22) 0%, transparent 58%),
+    linear-gradient(180deg, #0e1533 0%, #0a0a0f 100%);
+  border-bottom: 1px solid rgba(96, 165, 250, 0.22);
+}
+/* 上端のアクセントライン（シアン→インディゴ→ゴールド） */
+.offer-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2ee6fc 0%, #6366f1 50%, #f6da90 100%);
+}
+.offer-hero-inner {
+  position: relative;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+.offer-hero-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #7dd3fc;
+}
+.offer-hero-brand::before,
+.offer-hero-brand::after {
+  content: "";
+  width: 1.6rem;
+  height: 1px;
+  background: rgba(125, 211, 252, 0.5);
+}
+.offer-hero-title {
+  margin: 0 0 0.6rem;
+  font-size: 1.4rem;
+  line-height: 1.45;
+  font-weight: 800;
+  color: #fff;
+  text-wrap: balance;
+  text-shadow: 0 2px 20px rgba(99, 102, 241, 0.4);
+}
+.offer-hero-title .hero-amp {
+  color: #94a3b8;
+  font-weight: 700;
+  margin: 0 0.1rem;
+}
+.offer-hero-title .hero-vip {
+  color: #f6da90;
+  text-shadow: 0 0 18px rgba(246, 218, 144, 0.5);
+}
+.offer-hero-sub {
+  display: inline-block;
+  margin: 0;
+  padding: 0.45rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #06222b;
+  background: linear-gradient(135deg, #2ee6fc 0%, #38bdf8 100%);
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(46, 230, 252, 0.28);
+}
+@media (min-width: 768px) {
+  .offer-hero {
+    padding: 3.4rem 1.25rem 2.8rem;
+  }
+  .offer-hero-title {
+    font-size: 2.25rem;
+  }
+}
+
+/* ===== offer ページ（offer.md を描画する用のスタイル） ===== */
+/* 日本語の禁則処理：単語・長音記号の途中で折れるのを防ぎ、自然な改行にする */
+.offer-md,
+.offer-md p,
+.offer-md li,
+.offer-md h1,
+.offer-md h2,
+.offer-md h3,
+.offer-md blockquote {
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+.offer-md h2,
+.offer-md h3 {
+  text-wrap: balance;
+}
+/* h1 は balance を使わない（タイトルが語中で割れるのを防ぎ、全角スペースで折る） */
+.offer-md h1 {
+  text-wrap: nowrap;
+  text-wrap: pretty;
+}
+.offer-md p,
+.offer-md li {
+  text-wrap: pretty;
+}
+.offer-md h1 {
+  font-size: 1.6rem;
+  line-height: 1.35;
+  font-weight: 700;
+  text-align: center;
+  margin: 0.5rem 0 1.25rem;
+}
+@media (min-width: 768px) {
+  .offer-md h1 {
+    font-size: 2.25rem;
+  }
+}
+.offer-md h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #60a5fa;
+  border-bottom: 1px solid #1f2937;
+  padding-bottom: 0.5rem;
+  margin: 2.5rem 0 1rem;
+}
+.offer-md h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 1.5rem 0 0.75rem;
+}
+.offer-md p {
+  color: #e5e7eb;
+  font-size: 1rem;
+  line-height: 1.9;
+  margin: 1.1rem 0;
+}
+.offer-md ul,
+.offer-md ol {
+  color: #e5e7eb;
+  font-size: 1rem;
+  line-height: 1.85;
+  margin: 1.1rem 0;
+  padding-left: 1.5rem;
+}
+.offer-md ul {
+  list-style: disc;
+}
+.offer-md ol {
+  list-style: decimal;
+}
+.offer-md li {
+  margin: 0.5rem 0;
+}
+.offer-md strong {
+  color: #fff;
+  font-weight: 700;
+}
+.offer-md a {
+  color: #60a5fa;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.offer-md img {
+  width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  border: 1px solid rgba(30, 58, 138, 0.4);
+  margin: 1rem 0 0.5rem;
+}
+.offer-md blockquote {
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid #374151;
+  border-left: 3px solid #3b82f6;
+  border-radius: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  margin: 1.25rem 0;
+}
+.offer-md blockquote p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}
+.offer-md table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0.5rem;
+  margin: 1.25rem 0;
+  text-align: center;
+}
+.offer-md th {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.4rem;
+}
+.offer-md td {
+  background: rgba(30, 58, 138, 0.25);
+  border: 1px solid rgba(30, 64, 175, 0.4);
+  border-radius: 0.75rem;
+  padding: 1rem 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #93c5fd;
+}
+.offer-md hr {
+  border: 0;
+  border-top: 1px solid #1f2937;
+  margin: 2.25rem 0;
+}
+/* ===== 実績スタッツカード（勝率 / 資産増加 / 利用料） ===== */
+.offer-md .stat-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin: 1.6rem 0 0.6rem;
+}
+.offer-md .stat-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.15rem 0.4rem 1.3rem;
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.65) 0%, rgba(13, 18, 32, 0.65) 100%);
+  border: 1px solid #2a3550;
+  border-radius: 0.9rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+/* 上端アクセントライン（カードごとの色） */
+.offer-md .stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--stat-accent, #60a5fa);
+}
+/* 上部のほんのりした色グロー */
+.offer-md .stat-card::after {
+  content: "";
+  position: absolute;
+  top: -45%;
+  left: 50%;
+  width: 85%;
+  height: 85%;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, var(--stat-glow, rgba(96, 165, 250, 0.25)), transparent);
+  pointer-events: none;
+}
+.offer-md .stat-label {
+  position: relative;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+.offer-md .stat-value {
+  position: relative;
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--stat-accent, #93c5fd);
+  text-shadow: 0 0 16px var(--stat-glow, rgba(96, 165, 250, 0.5));
+  white-space: nowrap;
+}
+.offer-md .stat-unit {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.offer-md .stat-pre {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-right: 0.08rem;
+  vertical-align: 0.35em;
+}
+.offer-md .stat-card.is-rate {
+  --stat-accent: #2ee6fc;
+  --stat-glow: rgba(46, 230, 252, 0.3);
+}
+.offer-md .stat-card.is-gain {
+  --stat-accent: #34d399;
+  --stat-glow: rgba(52, 211, 153, 0.3);
+}
+.offer-md .stat-card.is-fee {
+  --stat-accent: #f6da90;
+  --stat-glow: rgba(246, 218, 144, 0.32);
+}
+@media (min-width: 768px) {
+  .offer-md .stat-cards {
+    gap: 1rem;
+  }
+  .offer-md .stat-label {
+    font-size: 1.15rem;
+  }
+  .offer-md .stat-value {
+    font-size: 2.4rem;
+  }
+  .offer-md .stat-unit {
+    font-size: 1.3rem;
+  }
+  .offer-md .stat-pre {
+    font-size: 0.95rem;
+  }
+}
+
+/* バナー（数字3カード）の下の注記：誇大に見せず、検証結果と免責を明示する */
+.offer-md .banner-note {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: #9ca3af;
+  text-align: center;
+  margin: 0.25rem 0 1.5rem;
+}
+
+/* ===== STEPカード（操作性：今どこが一目で分かる番号バッジ付き） ===== */
+.offer-md {
+  counter-reset: stepcounter;
+}
+.offer-md .step-card {
+  counter-increment: stepcounter;
+  scroll-margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #1f2937;
+  border-radius: 0.9rem;
+  padding: 1.5rem 1.25rem 1.4rem;
+  margin: 1.5rem 0;
+}
+/* STEP見出し：アイブロウ（小ラベル）＋タイトルのシンプル構成 */
+.offer-md .step-card > h2 {
+  border-bottom: none;
+  color: #fff;
+  margin: 0 0 1.1rem;
+  padding-bottom: 0;
+  font-size: 1.22rem;
+  line-height: 1.5;
+}
+.offer-md .step-card > h2::before {
+  content: "STEP " counter(stepcounter);
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #2ee6fc;
+}
+
+/* 通常のリンクはテキストリンク（青の下線）。ボタン化したいものは .cta-axon 等の専用クラスを使う */
+
+/* 主CTAボタン共通（ゴールド／グリーン） */
+.offer-md .cta-axon,
+.offer-md .cta-apply {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.08rem;
+  letter-spacing: 0.01em;
+  padding: 1.1rem 1rem;
+  margin: 1rem 0;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  transition: filter 0.15s, transform 0.1s;
+}
+/* 光沢が斜めに走るアニメ（高級感・注目喚起） */
+.offer-md .cta-axon::after,
+.offer-md .cta-apply::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%);
+  transform: skewX(-20deg);
+  animation: cta-shine 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes cta-shine {
+  0% { left: -75%; }
+  55%, 100% { left: 135%; }
+}
+.offer-md .cta-axon:hover,
+.offer-md .cta-apply:hover {
+  filter: brightness(1.05);
+}
+.offer-md .cta-axon:active,
+.offer-md .cta-apply:active {
+  transform: translateY(1px);
+}
+
+/* Axon 口座開設：ブランドに合わせた高級感のあるゴールド */
+.offer-md .cta-axon {
+  background: linear-gradient(135deg, #f6da90 0%, #e0b85a 42%, #c79433 100%);
+  color: #2a1c00;
+  border: 1px solid rgba(255, 232, 168, 0.7);
+  box-shadow: 0 6px 20px rgba(199, 148, 51, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  animation: cta-axon-glow 2.6s ease-in-out infinite;
+}
+@keyframes cta-axon-glow {
+  0%, 100% { box-shadow: 0 6px 20px rgba(199, 148, 51, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.45); }
+  50% { box-shadow: 0 9px 30px rgba(230, 184, 90, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.5); }
+}
+
+/* 申請フォームへ進む：波動シグナル研究所のブランドグラデーション（シアン→インディゴ→パープル） */
+.offer-md .cta-apply {
+  background: linear-gradient(135deg, #2ee6fc 0%, #6366f1 52%, #cc48f0 100%);
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(173, 216, 255, 0.6);
+  box-shadow: 0 6px 22px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  animation: cta-apply-glow 2.6s ease-in-out infinite;
+}
+@keyframes cta-apply-glow {
+  0%, 100% { box-shadow: 0 6px 22px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+  50% { box-shadow: 0 10px 32px rgba(204, 72, 240, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4); }
+}
+.offer-md .cta-axon-arw,
+.offer-md .cta-apply-arw {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* ===== Axon CTA を矢印で挟んで強調する誘導ブロック（中央寄せ） ===== */
+.offer-md .cta-lead {
+  text-align: center;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #e5e7eb;
+  line-height: 1.7;
+  margin: 1.75rem 0 0.4rem;
+}
+.offer-md .cta-arrows {
+  text-align: center;
+  color: #e0b85a;
+  font-size: 1.2rem;
+  letter-spacing: 0.35em;
+  line-height: 1.1;
+  margin: 0.2rem 0;
+  user-select: none;
+}
+.offer-md .cta-arrows-down {
+  margin-bottom: 0.55rem;
+  animation: cta-arrow-down 1.4s ease-in-out infinite;
+}
+.offer-md .cta-arrows-up {
+  margin-top: 0.55rem;
+  animation: cta-arrow-up 1.4s ease-in-out infinite;
+}
+@keyframes cta-arrow-down {
+  0%, 100% { transform: translateY(0); opacity: 0.8; }
+  50% { transform: translateY(4px); opacity: 1; }
+}
+@keyframes cta-arrow-up {
+  0%, 100% { transform: translateY(0); opacity: 0.8; }
+  50% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* 動きを抑える設定の利用者にはアニメを止める */
+@media (prefers-reduced-motion: reduce) {
+  .offer-md .cta-axon,
+  .offer-md .cta-apply {
+    animation: none;
+  }
+  .offer-md .cta-axon::after,
+  .offer-md .cta-apply::after {
+    display: none;
+  }
+  .offer-md .cta-arrows-down,
+  .offer-md .cta-arrows-up {
+    animation: none;
+  }
+}
+
+/* ===== シンプルな手順フロー図解（番号ボックス＋下向き矢印） ===== */
+.offer-md .flow {
+  margin: 1.25rem 0;
+}
+.offer-md .flow-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(30, 41, 59, 0.45);
+  border: 1px solid #334155;
+  border-radius: 0.65rem;
+  padding: 0.85rem 1rem;
+}
+.offer-md .flow-step + .flow-step {
+  margin-top: 1.45rem;
+}
+.offer-md .flow-step:not(:last-child)::after {
+  content: "▼";
+  position: absolute;
+  left: 50%;
+  bottom: -1.18rem;
+  transform: translateX(-50%);
+  color: #64748b;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+.offer-md .flow-num {
+  flex-shrink: 0;
+  width: 1.7rem;
+  height: 1.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(96, 165, 250, 0.18);
+  border: 1px solid rgba(96, 165, 250, 0.55);
+  color: #93c5fd;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.offer-md .flow-text {
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ===== Axon Markets について（特長フィーチャーボックス） ===== */
+.offer-md .axon-feature {
+  margin: 1.3rem 0;
+  padding: 1.15rem 1.15rem 1.25rem;
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.09) 0%, rgba(15, 23, 42, 0.25) 100%);
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  border-radius: 0.9rem;
+}
+.offer-md .axon-feature > h3:first-child {
+  margin: 0 0 0.6rem;
+  color: #7dd3fc;
+  font-size: 1.12rem;
+}
+.offer-md .axon-feature > p {
+  margin: 0.5rem 0;
+  font-size: 0.92rem;
+}
+.offer-md .axon-feature ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.95rem 0 0;
+}
+.offer-md .axon-feature li {
+  position: relative;
+  padding-left: 1.85rem;
+  margin: 0.65rem 0;
+  font-size: 0.93rem;
+  line-height: 1.6;
+}
+.offer-md .axon-feature li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  width: 1.3rem;
+  height: 1.3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  border-radius: 999px;
+}
+.offer-md .axon-feature li strong {
+  color: #fff;
+}
+.offer-md .axon-trust {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 1.1rem 0 0;
+  padding: 0.85rem 1rem;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.38);
+  border-radius: 0.65rem;
+  color: #d1fae5;
+  font-weight: 700;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+/* ===== 図解ガイドを開くボタン（offer.md 内の <button data-guide=...>） ===== */
+.offer-md .guide-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  margin: 1.6rem 0;
+  text-align: left;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.5);
+  color: #bfdbfe;
+  font-weight: 700;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  padding: 0.95rem 1.1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.offer-md .guide-btn:hover {
+  background: rgba(37, 99, 235, 0.22);
+  border-color: #60a5fa;
+}
+.offer-md .guide-btn .guide-btn-ico {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.offer-md .guide-btn .guide-btn-label {
+  flex: 1;
+}
+.offer-md .guide-btn .guide-btn-arw {
+  font-size: 1.4rem;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.offer-md .guide-btn.guide-btn-sub {
+  background: rgba(31, 41, 55, 0.4);
+  border-color: #374151;
+  color: #9ca3af;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.offer-md .guide-btn.guide-btn-sub:hover {
+  background: rgba(31, 41, 55, 0.7);
+  border-color: #4b5563;
+}
+
+/* ===== 図解ガイドのモーダル（重なり窓） ===== */
+.guide-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+}
+.guide-modal {
+  background: #0a0a0f;
+  border: 1px solid #1f2937;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 48rem;
+  margin: auto;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.guide-modal-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  background: #0a0a0f;
+  border-bottom: 1px solid #1f2937;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+.guide-modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+}
+.guide-modal-close {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #9ca3af;
+  background: rgba(31, 41, 55, 0.6);
+  border: 1px solid #374151;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+.guide-modal-close:hover {
+  color: #fff;
+  background: rgba(55, 65, 81, 0.8);
+}
+.guide-modal-body {
+  overflow-y: auto;
+  padding: 0.5rem 1.25rem 0.75rem;
+}
+.guide-modal-body h2:first-child {
+  margin-top: 0.75rem;
+}
+.guide-modal-footer {
+  padding: 0.75rem 1.25rem 1rem;
+  border-top: 1px solid #1f2937;
+}
+.guide-modal-back {
+  width: 100%;
+  padding: 0.8rem;
+  font-weight: 700;
+  color: #bfdbfe;
+  background: rgba(37, 99, 235, 0.15);
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.guide-modal-back:hover {
+  background: rgba(37, 99, 235, 0.28);
 }
