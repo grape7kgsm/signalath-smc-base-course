@@ -174,20 +174,7 @@ export default function ApplyPage() {
             />
           </Section>
 
-          {/* Section 4: Discord ID */}
-          <Section title="Discord ID" required>
-            <p className="text-xs text-gray-500 mb-4">
-              IDを正確に入力してください。
-              すべてのやり取りと主要なサービスはDiscordを通じて行われます。
-            </p>
-            <TextInput
-              value={form.discordId}
-              onChange={(v) => setForm({ ...form, discordId: v })}
-              placeholder="例: username#1234 または ユーザー名"
-            />
-          </Section>
-
-          {/* Section 5: TradingView ID */}
+          {/* Section 4: TradingView ID */}
           <Section title="TradingView ユーザー名" required>
             <p className="text-xs text-gray-500 mb-4">
               インジケーター権限を受け取るには、TradingViewへの登録が必須です。
@@ -197,6 +184,19 @@ export default function ApplyPage() {
               value={form.tradingViewId}
               onChange={(v) => setForm({ ...form, tradingViewId: v })}
               placeholder="例: ME_Chart_Lab"
+            />
+          </Section>
+
+          {/* Section 5: Discord ID */}
+          <Section title="Discord ID" required>
+            <p className="text-xs text-gray-500 mb-4">
+              IDを正確に入力してください。
+              すべてのやり取りと主要なサービスはDiscordを通じて行われます。
+            </p>
+            <TextInput
+              value={form.discordId}
+              onChange={(v) => setForm({ ...form, discordId: v })}
+              placeholder="例: username#1234 または ユーザー名"
             />
           </Section>
 
