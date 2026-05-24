@@ -342,22 +342,18 @@ body {
   padding: 1.5rem 1.25rem 1.4rem;
   margin: 1.5rem 0;
 }
-/* STEP見出し：アイブロウ（小ラベル）＋タイトルのシンプル構成 */
+/* STEP見出し：「STEP N：タイトル」を1行に連結。STEPはシアン、タイトルは白、下線で区切り */
 .offer-md .step-card > h2 {
-  border-bottom: none;
+  border-bottom: 1px solid #1f2937;
   color: #fff;
-  margin: 0 0 1.1rem;
-  padding-bottom: 0;
-  font-size: 1.22rem;
-  line-height: 1.5;
+  margin: 0 0 1.15rem;
+  padding-bottom: 0.7rem;
+  font-size: 1.18rem;
+  line-height: 1.55;
 }
 .offer-md .step-card > h2::before {
-  content: "STEP " counter(stepcounter);
-  display: block;
-  margin-bottom: 0.45rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  content: "STEP " counter(stepcounter) "：";
+  font-weight: 800;
   color: #2ee6fc;
 }
 
