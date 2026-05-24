@@ -88,17 +88,17 @@
 
 <div class="step-card" id="step-account-number">
 
-## 取引口座を開設・入金して口座番号を確認する
+## ライブ口座開設→MT5用の口座番号の取得方法
 
-本人確認が終わったら、取引用の「ライブ口座」を作成し、最低 30,000円（220 USD相当）を入金します。このライブ口座の番号（MT5 ID）が、申請フォームで必要になります。
+本人確認が終わったら、取引用の「ライブ口座」（すぐ作れます）を作成し、最低 30,000円（220 USD相当）を入金します。このライブ口座の番号（MT5 ID）が、申請フォームで必要になります。
 
 <div class="flow">
-<div class="flow-step"><span class="flow-num">1</span><span class="flow-text">取引用のライブ口座を作成する（すぐ作れます。図解で解説）</span></div>
+<div class="flow-step"><span class="flow-num">1</span><span class="flow-text">取引用のライブ口座を作成する（図解で解説）</span></div>
 <div class="flow-step"><span class="flow-num">2</span><span class="flow-text">30,000円〜を入金する</span></div>
 <div class="flow-step"><span class="flow-num">3</span><span class="flow-text">口座番号（MT5 ID）を確認・メモする</span></div>
 </div>
 
-<button class="guide-btn" data-guide="deposit" type="button"><span class="guide-btn-ico">📖</span><span class="guide-btn-label">取引口座開設＆入金の流れ（図解入り）</span><span class="guide-btn-arw">›</span></button>
+<button class="guide-btn" data-guide="deposit" type="button"><span class="guide-btn-ico">📖</span><span class="guide-btn-label">Axonのライブ口座開設〜MT5の口座番号の取得する方法（図解入り）</span><span class="guide-btn-arw">›</span></button>
 
 > **入金について**
 > 入金方法は銀行振込・クレジットカード・仮想通貨に対応しています。30,000円を入金する場合、ドル円155円のときで約194ドルが目安です（為替により変動）。
@@ -156,7 +156,7 @@
 
 <div class="step-card" id="step-apply">
 
-## インジケーター申請フォームを入力する
+## 準備した番号を入力してインジケーターを申請
 
 ここまでおつかれさまでした！
 
