@@ -540,13 +540,13 @@ body {
 .offer-md .axon-feature {
   margin: 1.3rem 0;
   padding: 1.15rem 1.15rem 1.25rem;
-  background: linear-gradient(180deg, rgba(37, 99, 235, 0.09) 0%, rgba(15, 23, 42, 0.25) 100%);
-  border: 1px solid rgba(96, 165, 250, 0.28);
+  background: linear-gradient(180deg, rgba(199, 148, 51, 0.1) 0%, rgba(15, 23, 42, 0.25) 100%);
+  border: 1px solid rgba(246, 218, 144, 0.32);
   border-radius: 0.9rem;
 }
 .offer-md .axon-feature > h3:first-child {
   margin: 0 0 0.6rem;
-  color: #7dd3fc;
+  color: #f6da90;
   font-size: 1.12rem;
 }
 .offer-md .axon-feature > p {
@@ -577,9 +577,9 @@ body {
   justify-content: center;
   font-size: 0.78rem;
   font-weight: 800;
-  color: #34d399;
-  background: rgba(52, 211, 153, 0.15);
-  border: 1px solid rgba(52, 211, 153, 0.45);
+  color: #f6da90;
+  background: rgba(246, 218, 144, 0.14);
+  border: 1px solid rgba(246, 218, 144, 0.5);
   border-radius: 999px;
 }
 .offer-md .axon-feature li strong {
@@ -591,10 +591,10 @@ body {
   gap: 0.55rem;
   margin: 1.1rem 0 0;
   padding: 0.85rem 1rem;
-  background: rgba(52, 211, 153, 0.1);
-  border: 1px solid rgba(52, 211, 153, 0.38);
+  background: rgba(246, 218, 144, 0.1);
+  border: 1px solid rgba(246, 218, 144, 0.4);
   border-radius: 0.65rem;
-  color: #d1fae5;
+  color: #f3e7c4;
   font-weight: 700;
   font-size: 0.92rem;
   line-height: 1.55;
