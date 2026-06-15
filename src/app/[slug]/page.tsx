@@ -85,7 +85,7 @@ function renderBlock(block: string, blockIndex: number) {
     return (
       <h2
         key={key}
-        className="text-lg sm:text-xl font-bold mt-12 mb-6 text-white border-l-2 border-cyan-500 pl-3"
+        className="text-xl sm:text-2xl font-bold mt-12 mb-6 text-white border-l-2 border-cyan-500 pl-3"
       >
         {trimmed.slice(2).trim()}
       </h2>
@@ -98,7 +98,7 @@ function renderBlock(block: string, blockIndex: number) {
     return (
       <h2
         key={key}
-        className="text-lg sm:text-xl font-bold mt-12 mb-6 text-white border-l-2 border-cyan-500 pl-3"
+        className="text-xl sm:text-2xl font-bold mt-12 mb-6 text-white border-l-2 border-cyan-500 pl-3"
       >
         {h2Match[1]}
       </h2>
@@ -110,7 +110,7 @@ function renderBlock(block: string, blockIndex: number) {
   if (h2Content) {
     return (
       <div key={key}>
-        <h2 className="text-lg sm:text-xl font-bold mt-12 mb-6 text-white border-l-2 border-cyan-500 pl-3">
+        <h2 className="text-xl sm:text-2xl font-bold mt-12 mb-6 text-white border-l-2 border-cyan-500 pl-3">
           {h2Content[1]}
         </h2>
         {renderSubContent(h2Content[2], key)}
@@ -123,7 +123,7 @@ function renderBlock(block: string, blockIndex: number) {
     return (
       <h3
         key={key}
-        className="text-base sm:text-lg font-semibold mt-10 mb-4 text-cyan-300"
+        className="text-lg sm:text-xl font-semibold mt-10 mb-4 text-cyan-300"
       >
         {trimmed.slice(4)}
       </h3>
@@ -140,7 +140,7 @@ function renderBlock(block: string, blockIndex: number) {
     return (
       <div
         key={key}
-        className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 my-8 text-sm"
+        className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 my-8 text-[15px] sm:text-base"
       >
         <p className="text-amber-300 leading-relaxed">{renderInline(trimmed)}</p>
       </div>
@@ -152,7 +152,7 @@ function renderBlock(block: string, blockIndex: number) {
     return (
       <div
         key={key}
-        className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 my-8 text-sm"
+        className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 my-8 text-[15px] sm:text-base"
       >
         <p className="text-emerald-300 leading-relaxed">{renderInline(trimmed)}</p>
       </div>
@@ -183,7 +183,7 @@ function renderBlock(block: string, blockIndex: number) {
         {lines.map((l, li) => (
           <li
             key={li}
-            className="flex items-start gap-2.5 text-[15px] leading-relaxed text-gray-200"
+            className="flex items-start gap-2.5 text-[16px] sm:text-[18px] leading-relaxed text-gray-200"
           >
             <span className="text-cyan-500 mt-1.5 flex-shrink-0 text-[8px]">
               ●
@@ -215,7 +215,7 @@ function renderBlock(block: string, blockIndex: number) {
           return (
             <p
               key={`${key}-${li}`}
-              className="text-[15px] leading-[2.0] text-gray-200 mb-1.5"
+              className="text-[16px] sm:text-[18px] leading-[1.95] text-gray-200 mb-1.5"
             >
               {renderInline(line)}
             </p>
@@ -229,7 +229,7 @@ function renderBlock(block: string, blockIndex: number) {
   return (
     <p
       key={key}
-      className="text-[15px] leading-[2.0] text-gray-200 mb-8"
+      className="text-[16px] sm:text-[18px] leading-[1.95] text-gray-200 mb-8"
     >
       {renderInline(trimmed)}
     </p>
@@ -251,7 +251,7 @@ function renderSubContent(text: string, parentKey: string) {
           {currentBullets.map((b, bi) => (
             <li
               key={bi}
-              className="flex items-start gap-2.5 text-[15px] leading-relaxed text-gray-200"
+              className="flex items-start gap-2.5 text-[16px] sm:text-[18px] leading-relaxed text-gray-200"
             >
               <span className="text-cyan-500 mt-1.5 flex-shrink-0 text-[8px]">
                 ●
@@ -300,7 +300,7 @@ function renderSubContent(text: string, parentKey: string) {
         elements.push(
           <p
             key={`${parentKey}-p-${elements.length}`}
-            className="text-[15px] leading-[2.0] text-gray-200 mb-4"
+            className="text-[16px] sm:text-[18px] leading-[1.95] text-gray-200 mb-4"
           >
             {renderInline(line)}
           </p>
@@ -323,12 +323,12 @@ function renderSummaryBox(text: string, key: string) {
       key={key}
       className="bg-cyan-500/[0.07] border border-cyan-500/20 rounded-xl p-5 my-8"
     >
-      <p className="text-sm font-semibold text-cyan-400 mb-3">{title}</p>
+      <p className="text-[15px] sm:text-base font-semibold text-cyan-400 mb-3">{title}</p>
       <ul className="space-y-2">
         {items.map((item, ii) => (
           <li
             key={ii}
-            className="flex items-start gap-2 text-sm text-gray-200"
+            className="flex items-start gap-2 text-[15px] sm:text-base text-gray-200"
           >
             <span className="text-cyan-500 mt-0.5 flex-shrink-0">▸</span>
             <span>{renderInline(item.slice(2))}</span>
@@ -350,11 +350,11 @@ function renderCompareBox(text: string, key: string) {
       className="bg-white/[0.03] border border-white/10 rounded-xl p-5 my-8"
     >
       {title && (
-        <p className="text-sm font-semibold text-gray-300 mb-3">{title}</p>
+        <p className="text-[15px] sm:text-base font-semibold text-gray-300 mb-3">{title}</p>
       )}
       <div className="space-y-2">
         {items.map((item, ii) => (
-          <p key={ii} className="text-sm text-gray-300">
+          <p key={ii} className="text-[15px] sm:text-base text-gray-300">
             {renderInline(item)}
           </p>
         ))}
@@ -407,7 +407,7 @@ export default async function ContentPage({ params }: PageProps) {
             </h1>
           </div>
 
-          <div className="bg-white/[0.04] border border-white/10 rounded-lg p-5 mb-12 space-y-3 text-sm">
+          <div className="bg-white/[0.04] border border-white/10 rounded-lg p-5 mb-12 space-y-3 text-[15px] sm:text-base">
             <p>
               <span className="font-medium text-cyan-400">学習目標：</span>
               <span className="text-gray-200">{content.learningGoal}</span>
@@ -435,7 +435,7 @@ export default async function ContentPage({ params }: PageProps) {
                 <span className="text-xs text-gray-500 block mb-1">
                   &larr; 前の章
                 </span>
-                <span className="text-sm font-medium line-clamp-1 text-gray-200 group-hover:text-white transition-colors">
+                <span className="text-[15px] font-medium line-clamp-1 text-gray-200 group-hover:text-white transition-colors">
                   {prev.title}
                 </span>
               </Link>
@@ -450,7 +450,7 @@ export default async function ContentPage({ params }: PageProps) {
                 <span className="text-xs text-gray-500 block mb-1">
                   次の章 &rarr;
                 </span>
-                <span className="text-sm font-medium line-clamp-1 text-gray-200 group-hover:text-white transition-colors">
+                <span className="text-[15px] font-medium line-clamp-1 text-gray-200 group-hover:text-white transition-colors">
                   {next.title}
                 </span>
               </Link>
